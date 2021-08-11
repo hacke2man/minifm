@@ -9,15 +9,13 @@ BINS = $(SRCS:src/%.c=%)
 LINK = $(BINS:%=build/%.o)
 
 all: ${BINS}
-	@echo -n linking...
-	@$(cc) $(libs) $(flags) $(LINK)
-	@echo " done"
+	$(cc) $(libs) $(flags) $(LINK)
 
 %: src/%.c
-	@echo -n compiling $<
-	@$(cc) -c $< -o build/$@.o
-	@echo " done"
+	$(cc) -c $< -o build/$@.o
 
 clean:
-	@echo cleaning...
-	@rm build/* a.out
+	rm build/* a.out
+
+install: all
+	cp a.out /bin/mfm
