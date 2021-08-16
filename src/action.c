@@ -7,24 +7,63 @@
 #include "string.h"
 #include "info.h"
 
-void editFile(char * selected)
+// void draw(char ** out, int dirCount, int selected, FILE * tty)
+void draw(t_state * state)
 {
-  system ("/bin/stty -raw");
-  system ("/bin/stty echo");
-  printf("\e[?25h");
+  char ** out = state->bufferArray;
+  int selected = *state->selected;
+  int dirCount = *state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
+  char color_str[255] = {'\0'};
+  int color;
+  char lineNum[255];
+  fprintf(tty, "\033[J");
+  for(int i = getStart(selected,  dirCount);
+  i < getEnd(selected,  dirCount);
+  i++)
+  {
+    color = 37;
+    sprintf(color_str, "");
+    sprintf(lineNum, "\e[0;90m%d\e[0m", selected - i > 0 ? selected - i : (selected - i) * (0 - 1));
+
+    if(isDir(out[i]))
+    {
+      color = 34;
+      sprintf(color_str, "\e[%dm" , color);
+    }
+
+    if(i == selected)
+    {
+      sprintf(color_str, "\e[%d;30m" , color + 10);
+      sprintf(lineNum, "\e[30;100m%d", i + 1);
+    }
+
+    fprintf(tty, "\033[K%s %s%s\e[0m\n\r", lineNum, color_str, out[i]);
+  }
+  fprintf(tty, "\033[%dA", getEnd(selected, dirCount) - getStart(selected, dirCount));
+}
+
+void editFile(char * selected, FILE * tty, struct termios oldt)
+{
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fprintf(tty, "\e[?25h");
+
+  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
+  fprintf(output, "echo\n -n\n");
+  fclose(output);
   pid_t pid = fork();
   if(pid == 0)
   {
+    printf("");
     execlp(getenv("EDITOR"), getenv("EDITOR"), selected, NULL);
     _exit(0);
   }else
   {
     int status;
     waitpid(pid, &status, 0);
+    exit(0);
   }
-  printf("\e[?25l");
-  system ("/bin/stty raw");
-  system ("/bin/stty -echo");
 }
 
 int compFunc(const void * a, const void * b)
@@ -73,6 +112,109 @@ void changeDir(char * sel, char  ** out )
   }
   closedir(dir);
   chdir(sel);
-
   qsort(out, dircount, sizeof(char *), compFunc);
+}
+
+void enter(t_state * state)
+{
+  char ** out = state->bufferArray;
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
+
+  if(isDir(out[*selected]) && *selected >= 0 && *selected < *dirCount)
+  {
+    FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
+    char * sel = malloc(sizeof(out[*selected]));
+    strcpy(sel, out[*selected]);
+    *selected = 0;
+
+    for(int i = 0; i < *dirCount; i++)
+      free(out[i]);
+
+    fprintf(tty, "\033[J");
+    strcat(cwd, "/");
+    strcat(cwd, sel);
+    // *dirCount = countDir(cwd);
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+    fprintf(tty, "\e[?25h");
+    fprintf(output, "cd\n%s\n", cwd);
+    exit(0);
+    // changeDir(cwd, out);
+  } else if (*selected >= 0 && *selected < *dirCount)
+    editFile(out[*selected], tty, state->oldt);
+}
+
+int matchScore(char * search, char * check)
+{
+  int score = 0;
+  for(int i = 0; i < strlen(check); i++)
+  {
+    if(search[i] == check[i])
+    {
+      score++;
+    } else {
+      break;
+    }
+  }
+  return score;
+}
+
+// void Search(char ** out, int * dirCount, int * selected, char * cwd, FILE * tty)
+void Search(t_state * state)
+{
+  char ** out = state->bufferArray;
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
+  char tmp[2] = {' ', '\0'};
+  char search[256];
+  search[0] = '\0';
+  int bestScore = 0;
+  int bestMatchIndex = 0;
+  int currentScore = 0;
+  int numMatch = 0;
+  while(1)
+  {
+    tmp[0] = getchar();
+    if(tmp[0] == 27)
+      break;
+    else if(tmp[0] == '\r')
+    {
+      enter(state);
+      break;
+    }
+
+    strcat(search, tmp);
+    for(int i = 0; i < *dirCount; i++)
+    {
+      for(int j = 0; j < strlen(out[i]); j++)
+      {
+        if(out[i][j] == search[0])
+        {
+          currentScore = matchScore(&search[j], &out[i][j]);
+
+          if (currentScore > bestScore)
+          {
+            bestScore = currentScore;
+            bestMatchIndex = i;
+            *selected = bestMatchIndex;
+            draw(state);
+            numMatch++;
+          } else if (currentScore == bestScore)
+            numMatch++;
+        }
+      }
+    }
+    if (numMatch == 1)
+    {
+      enter(state);
+      draw(state);
+      break;
+    }
+    numMatch = 0;
+  }
 }

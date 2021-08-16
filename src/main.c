@@ -3,52 +3,26 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <unistd.h>
+#include <termios.h>
 
 #include "info.h"
 #include "action.h"
+#include "types.h"
 
-void draw(char ** out, int dirCount, int selected)
+
+// int input(char ** out, int * selected, int * dirCount, char * cwd, FILE * tty)
+int input(t_state * state)
 {
-  char color_str[255] = {'\0'};
-  int color;
-  char lineNum[255];
-  for(int i = getStart(selected,  dirCount);
-  i < getEnd(selected,  dirCount);
-  i++)
-  {
-    color = 37;
-    sprintf(color_str, "");
-    sprintf(lineNum, "\e[0;90m%d\e[0m", selected - i > 0 ? selected - i : (selected - i) * (0 - 1));
-
-    if(isDir(out[i]))
-    {
-      color = 34;
-      sprintf(color_str, "\e[%dm" , color);
-    }
-
-    if(i == selected)
-    {
-      sprintf(color_str, "\e[%d;30m" , color + 10);
-      sprintf(lineNum, "\e[30;100m%d", i + 1);
-    }
-
-    printf("\033[K%s %s%s\e[0m\n\r", lineNum, color_str, out[i]);
-  }
-  printf("\033[%dA", getEnd(selected, dirCount) - getStart(selected, dirCount));
-}
-
-void input(char ** out, int * selected, int * dirCount, char * cwd)
-{
+  char ** out = state->bufferArray;
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
   char chr = getchar();
   switch(chr)
   {
     case 27:
-      system ("/bin/stty -raw");
-      system ("/bin/stty echo");
-      printf("\e[?25h");
-      getcwd(cwd, sizeof(cwd));
-      printf("%s\n", cwd);
-      exit(0);
+      return 1;
       break;
     case 'j':
       *selected = *selected < *dirCount - 1 ? *selected + 1 : *selected;
@@ -56,38 +30,41 @@ void input(char ** out, int * selected, int * dirCount, char * cwd)
     case 'k':
       *selected = *selected > 0 ? *selected - 1 : *selected;
       break;
-    //FIXME: make .. work
     case '\r':
-      if(isDir(out[*selected]) && *selected >= 0 && *selected < *dirCount)
-      {
-        char * sel = malloc(sizeof(out[*selected]));
-        strcpy(sel, out[*selected]);
-        *selected = 0;
-
-        for(int i = 0; i < *dirCount; i++)
-          free(out[i]);
-
-        printf("\033[J");
-        *dirCount = countDir(sel);
-
-        changeDir(sel, out);
-      } else if (*selected >= 0 && *selected < *dirCount)
-      editFile(out[*selected]);
+      enter(state);
       break;
     case 'b':
-      for(int i = 0; i < *dirCount; i++)
+    FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
+
+    for(int i = 0; i < *dirCount; i++)
       free(out[i]);
 
-      *dirCount = countDir(".");
-      changeDir("..", out);
+    fprintf(tty, "\033[J");
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+    fprintf(tty, "\e[?25h");
+    fprintf(output, "cd\n..\n");
+    exit(0);
       break;
+    case '/':
+      Search(state);
+    break;
   }
+
+  return 0;
 }
 
 int main(int argc, char * argv[]) {
-  system ("/bin/stty raw");
-  system ("/bin/stty -echo");
-  printf("\e[?25l");
+  int done = 0;
+  FILE * tty = fopen("/dev/tty", "w");
+  int c;
+  static struct termios oldt, newt;
+  tcgetattr( STDIN_FILENO, &oldt);
+  /* newt = oldt;
+  newt.c_lflag &= ~(ICANON); */
+  cfmakeraw(&newt);
+  tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+  fprintf(tty, "\e[?25l");
 
   int dirCount = countDir(argv[1]);
   int selected = 0;
@@ -95,10 +72,26 @@ int main(int argc, char * argv[]) {
   char cwd[256];
   getcwd(cwd, sizeof(cwd));
   
+  t_state * state = malloc(sizeof(t_state));
+  state->cwd = cwd;
+  state->bufferArray = out;
+  state->dirCount = &dirCount;
+  state->newt = newt;
+  state->oldt = oldt;
+  state->selected = &selected;
+  state->tty = tty;
 
   changeDir(argv[1], out);
-  while(1){
-    draw(out, dirCount, selected);
-    input(out, &selected, &dirCount, cwd);
+  while(!done){
+    draw(state);
+    done = input(state);
   }
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fprintf(tty, "\e[?25h");
+  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
+  fprintf(output, "echo\n-n\n");
+  fclose(output);
+   
+  exit(0);
 }
