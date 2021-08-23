@@ -9,7 +9,8 @@
 #include "action.h"
 #include "types.h"
 
-//TODO: make gg, and G go to the top and bottom of file list respectivly
+//TODO: implement multi char commands
+//TODO: make gg move to top of list
 //TODO: implement system for adding counts to commands
 //TODO: make dd delete file under cursor
 //TODO: implement yank, and put
@@ -36,25 +37,31 @@ int input(t_state * state)
     case 'k':
       *selected = *selected > 0 ? *selected - 1 : *selected;
       break;
+    case 'g':
+      *selected = 0;
+      break;
+    case 'G':
+      *selected = *dirCount - 1;
+      break;
     case '\r':
       if(enter(state) == 0)
-        return 1;
+      return 1;
       break;
     case 'b':
 
-    for(int i = 0; i < *dirCount; i++)
-      free(bufferArray[i]);
+      for(int i = 0; i < *dirCount; i++)
+        free(bufferArray[i]);
 
-    fprintf(tty, "\033[J");
-    tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
-    fprintf(tty, "\e[?25h");
-    printf("cd\n..\n");
-    exit(0);
+      fprintf(tty, "\033[J");
+      tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+      fprintf(tty, "\e[?25h");
+      printf("..");
+      exit(0);
       break;
     case '/':
       Search(state);
       return 1;
-    break;
+      break;
   }
 
   return 0;
