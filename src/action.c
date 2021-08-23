@@ -11,7 +11,7 @@
 //TODO: add option to show git info
 void draw(t_state * state)
 {
-  char ** out = state->bufferArray;
+  char ** bufferArray = state->bufferArray;
   int selected = *state->selected;
   int dirCount = *state->dirCount;
   char * cwd = state->cwd;
@@ -28,7 +28,7 @@ void draw(t_state * state)
     sprintf(color_str, "");
     sprintf(lineNum, "\e[0;90m%d\e[0m", selected - i > 0 ? selected - i : (selected - i) * (0 - 1));
 
-    if(isDir(out[i]))
+    if(isDir(bufferArray[i]))
     {
       color = 34;
       sprintf(color_str, "\e[%dm" , color);
@@ -40,7 +40,7 @@ void draw(t_state * state)
       sprintf(lineNum, "\e[30;100m%d", i + 1);
     }
 
-    fprintf(tty, "\033[K%s %s%s\e[0m\n\r", lineNum, color_str, out[i]);
+    fprintf(tty, "\033[K%s %s%s\e[0m\n\r", lineNum, color_str, bufferArray[i]);
   }
   fprintf(tty, "\033[%dA", getEnd(selected, dirCount) - getStart(selected, dirCount));
 }
@@ -67,7 +67,7 @@ int compFunc(const void * a, const void * b)
 }
 
 //change proccess dir
-void changeDir(char * sel, char  ** out )
+void changeDir(char * sel, char  ** bufferArray )
 {
   int dircount = countDir(sel);
   DIR * dir;
@@ -84,33 +84,33 @@ void changeDir(char * sel, char  ** out )
   while(ent != NULL){
     if(ent->d_name[0] != '.')
     {
-      out[ind] = malloc(sizeof(ent->d_name));
-      memset(out[ind], '\0', sizeof(ent->d_name));
-      strcpy(out[ind], ent->d_name);
+      bufferArray[ind] = malloc(sizeof(ent->d_name));
+      memset(bufferArray[ind], '\0', sizeof(ent->d_name));
+      strcpy(bufferArray[ind], ent->d_name);
       ind++;
     }
     ent = readdir(dir);
   }
   closedir(dir);
   chdir(sel);
-  qsort(out, dircount, sizeof(char *), compFunc);
+  qsort(bufferArray, dircount, sizeof(char *), compFunc);
 }
 
 //output name of selected file and exit program
 int enter(t_state * state)
 {
-  char ** out = state->bufferArray;
+  char ** bufferArray = state->bufferArray;
   int * selected = state->selected;
   int * dirCount = state->dirCount;
   char * cwd = state->cwd;
   FILE * tty = state->tty;
 
-  char * sel = malloc(sizeof(out[*selected]));
-  strcpy(sel, out[*selected]);
+  char * sel = malloc(sizeof(bufferArray[*selected]));
+  strcpy(sel, bufferArray[*selected]);
   *selected = 0;
 
   for(int i = 0; i < *dirCount; i++)
-    free(out[i]);
+    free(bufferArray[i]);
 
   fprintf(tty, "\033[J");
   strcat(cwd, "/");
@@ -142,7 +142,7 @@ int matchScore(char * search, char * check)
 //TODO: highlight matches, and posible remove the files that do not
 void Search(t_state * state)
 {
-  char ** out = state->bufferArray;
+  char ** bufferArray = state->bufferArray;
   int * selected = state->selected;
   int * dirCount = state->dirCount;
   char * cwd = state->cwd;
@@ -168,11 +168,11 @@ void Search(t_state * state)
     strcat(search, tmp);
     for(int i = 0; i < *dirCount; i++)
     {
-      for(int j = 0; j < strlen(out[i]); j++)
+      for(int j = 0; j < strlen(bufferArray[i]); j++)
       {
-        if(out[i][j] == search[0])
+        if(bufferArray[i][j] == search[0])
         {
-          currentScore = matchScore(&search[j], &out[i][j]);
+          currentScore = matchScore(&search[j], &bufferArray[i][j]);
 
           if (currentScore > bestScore)
           {

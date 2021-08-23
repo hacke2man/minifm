@@ -8,7 +8,6 @@
 #include "info.h"
 #include "action.h"
 #include "types.h"
-//FIXME: fix the way state is handled in various functions
 
 //TODO: make gg, and G go to the top and bottom of file list respectivly
 //TODO: implement system for adding counts to commands
@@ -16,9 +15,10 @@
 //TODO: implement yank, and put
 //TODO: visual mode
 //TODO: insert mode to rename files
+//TODO: hide/show hidden files
 int input(t_state * state)
 {
-  char ** out = state->bufferArray;
+  char ** bufferArray = state->bufferArray;
   int * selected = state->selected;
   int * dirCount = state->dirCount;
   char * cwd = state->cwd;
@@ -43,7 +43,7 @@ int input(t_state * state)
     case 'b':
 
     for(int i = 0; i < *dirCount; i++)
-      free(out[i]);
+      free(bufferArray[i]);
 
     fprintf(tty, "\033[J");
     tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
@@ -62,40 +62,35 @@ int input(t_state * state)
 
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
-  int done = 0;
-  FILE * tty = fopen("/dev/tty", "w");
+  t_state * state = malloc(sizeof(t_state));
   int c;
-  static struct termios oldt, newt;
-  tcgetattr( STDIN_FILENO, &oldt);
-  cfmakeraw(&newt);
-  tcsetattr( STDIN_FILENO, TCSANOW, &newt);
-  fprintf(tty, "\e[?25l");
-
   int dirCount = countDir(argv[1]);
   int selected = 0;
-  char ** out = malloc(sizeof(char *) * 10000);
   char cwd[256];
-  getcwd(cwd, sizeof(cwd));
-  
-  t_state * state = malloc(sizeof(t_state));
-  state->cwd = cwd;
-  state->bufferArray = out;
-  state->dirCount = &dirCount;
-  state->newt = newt;
-  state->oldt = oldt;
-  state->selected = &selected;
-  state->tty = tty;
 
-  changeDir(argv[1], out);
+  state->tty = fopen("/dev/tty", "w");
+  state->dirCount = &dirCount;
+  state->selected = &selected;
+  state->bufferArray = malloc(sizeof(char *) * 10000);
+  state->cwd = cwd;
+
+  getcwd(cwd, sizeof(cwd));
+  tcgetattr( STDIN_FILENO, &state->oldt);
+  cfmakeraw(&state->newt);
+  tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);
+  fprintf(state->tty, "\e[?25l");
+  changeDir(argv[1], state->bufferArray);
+
   //program loop
+  int done = 0;
   while(!done){
     draw(state);
     done = input(state);
   }
 
-  fprintf(tty, "\033[J");
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  fprintf(tty, "\e[?25h");
+  fprintf(state->tty, "\033[J");
+  tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+  fprintf(state->tty, "\e[?25h");
    
   exit(0);
 }

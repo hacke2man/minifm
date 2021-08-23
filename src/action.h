@@ -7,7 +7,7 @@ extern "C" {
 #include <stdio.h>
 #include "types.h"
 
-void changeDir(char * sel, char  ** out );
+void changeDir(char * sel, char  ** bufferArray );
 void editFile(char * selected, FILE * tty, struct termios oldt);
 int enter(t_state * state);
 void draw(t_state * state);
