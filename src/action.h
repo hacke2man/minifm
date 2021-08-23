@@ -9,7 +9,7 @@ extern "C" {
 
 void changeDir(char * sel, char  ** out );
 void editFile(char * selected, FILE * tty, struct termios oldt);
-void enter(t_state * state);
+int enter(t_state * state);
 void draw(t_state * state);
 void Search(t_state * state);
 

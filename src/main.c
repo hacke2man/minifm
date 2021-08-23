@@ -19,7 +19,7 @@ int input(t_state * state)
   char * cwd = state->cwd;
   FILE * tty = state->tty;
   char chr = getchar();
-  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
+
   switch(chr)
   {
     case 27:
@@ -32,7 +32,8 @@ int input(t_state * state)
       *selected = *selected > 0 ? *selected - 1 : *selected;
       break;
     case '\r':
-      enter(state);
+      if(enter(state) == 0)
+        return 1;
       break;
     case 'b':
 
@@ -43,7 +44,7 @@ int input(t_state * state)
 
     tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
     fprintf(tty, "\e[?25h");
-    fprintf(output, "cd\n..\n");
+    printf("cd\n..\n");
     exit(0);
     // changeDir(cwd, out);
       break;
@@ -88,11 +89,11 @@ int main(int argc, char * argv[]) {
     done = input(state);
   }
 
+  fprintf(tty, "\033[J");
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
   fprintf(tty, "\e[?25h");
-  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
-  fprintf(output, "echo\n-n\n");
-  fclose(output);
+  // printf("echo\n-n\n");
+  // printf("%s", cwd);
    
   exit(0);
 }

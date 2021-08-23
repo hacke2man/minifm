@@ -49,9 +49,7 @@ void editFile(char * selected, FILE * tty, struct termios oldt)
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
   fprintf(tty, "\e[?25h");
 
-  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
-  fprintf(output, "echo\n -n\n");
-  fclose(output);
+  printf("echo\n -n\n");
   pid_t pid = fork();
   if(pid == 0)
   {
@@ -115,7 +113,7 @@ void changeDir(char * sel, char  ** out )
   qsort(out, dircount, sizeof(char *), compFunc);
 }
 
-void enter(t_state * state)
+int enter(t_state * state)
 {
   char ** out = state->bufferArray;
   int * selected = state->selected;
@@ -125,7 +123,6 @@ void enter(t_state * state)
 
   if(isDir(out[*selected]) && *selected >= 0 && *selected < *dirCount)
   {
-    FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
     char * sel = malloc(sizeof(out[*selected]));
     strcpy(sel, out[*selected]);
     *selected = 0;
@@ -138,13 +135,14 @@ void enter(t_state * state)
     strcat(cwd, sel);
     // *dirCount = countDir(cwd);
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+    // tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
     fprintf(tty, "\e[?25h");
-    fprintf(output, "cd\n%s\n", cwd);
-    exit(0);
+    printf("%s", cwd);
+    return 0;
     // changeDir(cwd, out);
   } else if (*selected >= 0 && *selected < *dirCount)
     editFile(out[*selected], tty, state->oldt);
+    return 1;
 }
 
 int matchScore(char * search, char * check)
@@ -181,7 +179,7 @@ void Search(t_state * state)
   {
     tmp[0] = getchar();
     if(tmp[0] == 27)
-      break;
+    break;
     else if(tmp[0] == '\r')
     {
       enter(state);
@@ -205,7 +203,7 @@ void Search(t_state * state)
             draw(state);
             numMatch++;
           } else if (currentScore == bestScore)
-            numMatch++;
+          numMatch++;
         }
       }
     }
