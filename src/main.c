@@ -19,6 +19,7 @@ int input(t_state * state)
   char * cwd = state->cwd;
   FILE * tty = state->tty;
   char chr = getchar();
+  FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
   switch(chr)
   {
     case 27:
@@ -34,7 +35,6 @@ int input(t_state * state)
       enter(state);
       break;
     case 'b':
-    FILE * output = fopen("/home/liam/.local/share/mfm/mfm_cmd", "w");
 
     for(int i = 0; i < *dirCount; i++)
       free(out[i]);
@@ -45,6 +45,7 @@ int input(t_state * state)
     fprintf(tty, "\e[?25h");
     fprintf(output, "cd\n..\n");
     exit(0);
+    // changeDir(cwd, out);
       break;
     case '/':
       Search(state);
