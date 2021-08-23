@@ -187,8 +187,7 @@ void Search(t_state * state)
     if (numMatch == 1)
     {
       enter(state);
-      draw(state);
-      break;
+      return;
     }
     numMatch = 0;
   }
