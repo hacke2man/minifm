@@ -10,7 +10,6 @@
 #include "types.h"
 
 
-// int input(char ** out, int * selected, int * dirCount, char * cwd, FILE * tty)
 int input(t_state * state)
 {
   char ** out = state->bufferArray;
@@ -45,10 +44,10 @@ int input(t_state * state)
     fprintf(tty, "\e[?25h");
     printf("cd\n..\n");
     exit(0);
-    // changeDir(cwd, out);
       break;
     case '/':
       Search(state);
+      return 1;
     break;
   }
 
@@ -61,8 +60,6 @@ int main(int argc, char * argv[]) {
   int c;
   static struct termios oldt, newt;
   tcgetattr( STDIN_FILENO, &oldt);
-  /* newt = oldt;
-  newt.c_lflag &= ~(ICANON); */
   cfmakeraw(&newt);
   tcsetattr( STDIN_FILENO, TCSANOW, &newt);
   fprintf(tty, "\e[?25l");
@@ -83,6 +80,7 @@ int main(int argc, char * argv[]) {
   state->tty = tty;
 
   changeDir(argv[1], out);
+  //program loop
   while(!done){
     draw(state);
     done = input(state);
@@ -91,8 +89,6 @@ int main(int argc, char * argv[]) {
   fprintf(tty, "\033[J");
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
   fprintf(tty, "\e[?25h");
-  // printf("echo\n-n\n");
-  // printf("%s", cwd);
    
   exit(0);
 }

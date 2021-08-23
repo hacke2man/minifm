@@ -7,7 +7,7 @@
 #include "string.h"
 #include "info.h"
 
-// void draw(char ** out, int dirCount, int selected, FILE * tty)
+//draws to terminal
 void draw(t_state * state)
 {
   char ** out = state->bufferArray;
@@ -44,26 +44,7 @@ void draw(t_state * state)
   fprintf(tty, "\033[%dA", getEnd(selected, dirCount) - getStart(selected, dirCount));
 }
 
-void editFile(char * selected, FILE * tty, struct termios oldt)
-{
-  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  fprintf(tty, "\e[?25h");
-
-  printf("echo\n -n\n");
-  pid_t pid = fork();
-  if(pid == 0)
-  {
-    printf("");
-    execlp(getenv("EDITOR"), getenv("EDITOR"), selected, NULL);
-    _exit(0);
-  }else
-  {
-    int status;
-    waitpid(pid, &status, 0);
-    exit(0);
-  }
-}
-
+//callback for comparing file names
 int compFunc(const void * a, const void * b)
 {
   char ** aval = (char **) a;
@@ -84,6 +65,7 @@ int compFunc(const void * a, const void * b)
   return ascore - bscore;
 }
 
+//change proccess dir
 void changeDir(char * sel, char  ** out )
 {
   int dircount = countDir(sel);
@@ -113,6 +95,7 @@ void changeDir(char * sel, char  ** out )
   qsort(out, dircount, sizeof(char *), compFunc);
 }
 
+//output name of selected file and exit program
 int enter(t_state * state)
 {
   char ** out = state->bufferArray;
@@ -137,6 +120,7 @@ int enter(t_state * state)
   return 0;
 }
 
+//assings a score based on how many letters match in strings
 int matchScore(char * search, char * check)
 {
   int score = 0;
@@ -152,7 +136,8 @@ int matchScore(char * search, char * check)
   return score;
 }
 
-// void Search(char ** out, int * dirCount, int * selected, char * cwd, FILE * tty)
+//Match user input against file list. output file name if only one match
+//or user hits enter
 void Search(t_state * state)
 {
   char ** out = state->bufferArray;
