@@ -41,7 +41,6 @@ int input(t_state * state)
       free(out[i]);
 
     fprintf(tty, "\033[J");
-
     tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
     fprintf(tty, "\e[?25h");
     printf("cd\n..\n");

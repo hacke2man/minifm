@@ -18,4 +18,4 @@ clean:
 	rm build/* a.out
 
 install: all
-	cp a.out /bin/mfm
+	cp a.out /usr/local/bin/mfm

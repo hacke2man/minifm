@@ -121,28 +121,20 @@ int enter(t_state * state)
   char * cwd = state->cwd;
   FILE * tty = state->tty;
 
-  if(isDir(out[*selected]) && *selected >= 0 && *selected < *dirCount)
-  {
-    char * sel = malloc(sizeof(out[*selected]));
-    strcpy(sel, out[*selected]);
-    *selected = 0;
+  char * sel = malloc(sizeof(out[*selected]));
+  strcpy(sel, out[*selected]);
+  *selected = 0;
 
-    for(int i = 0; i < *dirCount; i++)
-      free(out[i]);
+  for(int i = 0; i < *dirCount; i++)
+    free(out[i]);
 
-    fprintf(tty, "\033[J");
-    strcat(cwd, "/");
-    strcat(cwd, sel);
-    // *dirCount = countDir(cwd);
+  fprintf(tty, "\033[J");
+  strcat(cwd, "/");
+  strcat(cwd, sel);
 
-    // tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
-    fprintf(tty, "\e[?25h");
-    printf("%s", cwd);
-    return 0;
-    // changeDir(cwd, out);
-  } else if (*selected >= 0 && *selected < *dirCount)
-    editFile(out[*selected], tty, state->oldt);
-    return 1;
+  fprintf(tty, "\e[?25h");
+  printf("%s", cwd);
+  return 0;
 }
 
 int matchScore(char * search, char * check)

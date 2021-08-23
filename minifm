@@ -1,5 +1,0 @@
-#!/bin/sh
-./a.out </dev/tty
-cat $HOME/.local/share/mfm/mfm_cmd | head -1 | read mfm_cmd
-cat $HOME/.local/share/mfm/mfm_cmd | tail -1 | read mfm_dir
-$mfm_cmd $mfm_dir
