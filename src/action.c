@@ -8,6 +8,7 @@
 #include "info.h"
 
 //draws to terminal
+//TODO: add option to show git info
 void draw(t_state * state)
 {
   char ** out = state->bufferArray;
@@ -138,6 +139,7 @@ int matchScore(char * search, char * check)
 
 //Match user input against file list. output file name if only one match
 //or user hits enter
+//TODO: highlight matches, and posible remove the files that do not
 void Search(t_state * state)
 {
   char ** out = state->bufferArray;

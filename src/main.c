@@ -8,8 +8,14 @@
 #include "info.h"
 #include "action.h"
 #include "types.h"
+//FIXME: fix the way state is handled in various functions
 
-
+//TODO: make gg, and G go to the top and bottom of file list respectivly
+//TODO: implement system for adding counts to commands
+//TODO: make dd delete file under cursor
+//TODO: implement yank, and put
+//TODO: visual mode
+//TODO: insert mode to rename files
 int input(t_state * state)
 {
   char ** out = state->bufferArray;
@@ -54,6 +60,7 @@ int input(t_state * state)
   return 0;
 }
 
+//TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   int done = 0;
   FILE * tty = fopen("/dev/tty", "w");

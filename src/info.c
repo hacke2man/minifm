@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 //determin how many remaining files can be drawn
+//TODO: allow for custom view range
 int getEnd(int selected, int total)
 {
   if (total < 10 || selected + 5 > total)
@@ -11,6 +12,7 @@ int getEnd(int selected, int total)
 }
 
 //determin how many previous files can be drawn
+//TODO: allow for custom view range
 int getStart(int selected, int total)
 {
   if (selected > 5)
