@@ -9,64 +9,6 @@
 #include "action.h"
 #include "types.h"
 
-//TODO: implement multi char commands
-//TODO: make gg move to top of list
-//TODO: implement system for adding counts to commands
-//TODO: make dd delete file under cursor
-//TODO: implement yank, and put
-//TODO: visual mode
-//TODO: insert mode to rename files
-//TODO: hide/show hidden files
-int input(t_state * state)
-{
-  char ** bufferArray = state->bufferArray;
-  int * selected = state->selected;
-  int * dirCount = state->dirCount;
-  char * cwd = state->cwd;
-  FILE * tty = state->tty;
-  char chr = getchar();
-
-  switch(chr)
-  {
-    case 27:
-      return 1;
-      break;
-    case 'j':
-      *selected = *selected < *dirCount - 1 ? *selected + 1 : *selected;
-      break;
-    case 'k':
-      *selected = *selected > 0 ? *selected - 1 : *selected;
-      break;
-    case 'g':
-      *selected = 0;
-      break;
-    case 'G':
-      *selected = *dirCount - 1;
-      break;
-    case '\r':
-      if(enter(state) == 0)
-      return 1;
-      break;
-    case 'b':
-
-      for(int i = 0; i < *dirCount; i++)
-        free(bufferArray[i]);
-
-      fprintf(tty, "\033[J");
-      tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
-      fprintf(tty, "\e[?25h");
-      printf("..");
-      exit(0);
-      break;
-    case '/':
-      Search(state);
-      return 1;
-      break;
-  }
-
-  return 0;
-}
-
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   t_state * state = malloc(sizeof(t_state));

@@ -7,6 +7,155 @@
 #include "string.h"
 #include "info.h"
 
+int moveDown(t_state * state)
+{
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  *selected = *selected < *dirCount - 1 ? *selected + 1 : *selected;
+  return 0;
+}
+
+int exitProgram(t_state * state)
+{
+  return 1;
+}
+
+typedef struct {
+  char * combo;
+  int (*function)(t_state * state);
+} t_action;
+
+t_action * initAction(char * combo, int (*function)(t_state *) )
+{
+  t_action * newAction;
+
+  newAction = malloc(sizeof(t_action));
+  newAction->combo = malloc(sizeof(int));
+  newAction->combo = combo;
+  int (*fp)(t_state * state) = function;
+  newAction->function = malloc(sizeof(&exitProgram));
+  newAction->function = function;
+  return newAction;
+}
+
+void freeAction(t_action * action)
+{
+  free(action->combo);
+  free(action->function);
+}
+
+int canMatch(char * combo, t_action * actionlist[], int numActions)
+{
+  int matchable = 0;
+  for (int i = 0; i < numActions; i++)
+  {
+    if(strlen(combo) <= strlen(actionlist[i]->combo))
+    {
+      for(int j = 0; j < strlen(combo); j++)
+      {
+        if (combo[j] != actionlist[i]->combo[j]) 
+          break;
+        if(j == strlen(combo) - 1)
+          matchable = 1;
+      }
+    }
+  }
+  return matchable;
+}
+
+int gotoFirst(t_state * state)
+{
+  int * selected = state->selected;
+  *selected = 0;
+  return 0;
+}
+
+//TODO: make gg move to top of list
+//TODO: implement system for adding counts to commands
+//TODO: make dd delete file under cursor
+//TODO: implement yank, and put
+//TODO: visual mode
+//TODO: insert mode to rename files
+//TODO: hide/show hidden files
+int input(t_state * state)
+{
+  int cmdNum = 3;
+  t_action * commands[cmdNum];
+
+  commands[0] = initAction("\x1b", exitProgram);
+  commands[1] = initAction("j", moveDown);
+  commands[2] = initAction("gg", gotoFirst);
+
+  char tmp[2] = {' ', '\0'};
+  char combo[256];
+  combo[0] = '\0';
+
+  while(1)
+  {
+    tmp[0] = getchar();
+    strcat(combo, tmp);
+    if (!canMatch(combo, commands, cmdNum))
+    {
+      printf("%s", combo);
+      getchar();
+      return 0;
+    }
+
+    for (int i = 0; i < cmdNum; i++)
+    {
+      if (strcmp(combo, commands[i]->combo) == 0)
+      {
+        return commands[i]->function(state);
+      }
+    }
+  }
+  return 0;
+}
+/* {
+    else if (*chr == 'k')
+    {
+      *selected = *selected > 0 ? *selected - 1 : *selected;
+      break;
+    }
+    else if(*chr == 'G')
+    {
+      *selected = *dirCount - 1;
+      break;
+    }
+    else if(*chr == '\r')
+    {
+      if(enter(state) == 0)
+      return 1;
+    }
+    else if(*chr == 'b')
+    {
+      for(int i = 0; i < *dirCount; i++)
+        free(bufferArray[i]);
+
+      fprintf(tty, "\033[J");
+      tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+      fprintf(tty, "\e[?25h");
+      printf("..");
+      exit(0);
+    }
+    else if(*chr == '/')
+    {
+      Search(state);
+      return 1;
+    }
+
+    //multi
+    if (strcmp(chr, "gg") == 0)
+    {
+      *selected = 0;
+      break;
+    }
+  }
+
+  free(chr);
+  return 0;
+} */
+
 //draws to terminal
 //TODO: add option to show git info
 void draw(t_state * state)
