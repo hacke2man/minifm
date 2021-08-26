@@ -17,6 +17,17 @@ typedef struct state{
  struct termios newt;
 } t_state;
 
+typedef struct {
+  char * combo;
+  int (*function)(t_state * state);
+} t_action;
+
+struct actionNode {
+  t_action * action;
+  struct actionNode * nextNode;
+  struct actionNode * tail;
+};
+
 #ifdef __cplusplus
 }
 #endif

@@ -7,12 +7,10 @@ extern "C" {
 #include <stdio.h>
 #include "types.h"
 
-void changeDir(char * sel, char  ** bufferArray );
-void editFile(char * selected, FILE * tty, struct termios oldt);
+struct actionNode * initDefaultMappings();
 int enter(t_state * state);
 void draw(t_state * state);
-// int Search(t_state * state);
-int input(t_state * state);
+int input(t_state * state, struct actionNode * commands);
 
 #ifdef __cplusplus
 }
