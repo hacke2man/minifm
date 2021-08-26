@@ -11,7 +11,7 @@ void changeDir(char * sel, char  ** bufferArray );
 void editFile(char * selected, FILE * tty, struct termios oldt);
 int enter(t_state * state);
 void draw(t_state * state);
-void Search(t_state * state);
+// int Search(t_state * state);
 int input(t_state * state);
 
 #ifdef __cplusplus
