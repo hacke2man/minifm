@@ -4,7 +4,6 @@
 #include <limits.h>
 #include <unistd.h>
 #include <termios.h>
-#include <dirent.h>
 
 #include "info.h"
 #include "action.h"
@@ -51,68 +50,18 @@ void draw(t_state * state)
   fprintf(tty, "\033[%dA", getEnd(selected, dirCount) - getStart(selected, dirCount));
 }
 
-//callback for comparing file names
-int compFunc(const void * a, const void * b)
-{
-  char ** aval = (char **) a;
-  int ascore = 0;
-  if(isDir(*aval))
-    ascore -= 10 ;
-
-  char ** bval = (char **) b;
-  int bscore = 0;
-  if(isDir(*bval))
-    bscore -= 10;
-
-  if(strcmp(*aval, *bval) >= 0)
-    ascore++;
-  else
-    bscore++;
-  
-  return ascore - bscore;
-}
-
-//change proccess dir
-void changeDir(char * sel, char  ** bufferArray )
-{
-  int dircount = countDir(sel);
-  DIR * dir;
-  if( sel == NULL || strlen(sel) == 0)
-    dir =opendir(".");
-  else
-    dir = opendir(sel);
-
-  dircount = countDir(sel);
-  struct dirent * ent;
-  ent = readdir(dir);
-
-  int ind = 0;
-  while(ent != NULL){
-    if(ent->d_name[0] != '.')
-    {
-      bufferArray[ind] = malloc(sizeof(ent->d_name));
-      memset(bufferArray[ind], '\0', sizeof(ent->d_name));
-      strcpy(bufferArray[ind], ent->d_name);
-      ind++;
-    }
-    ent = readdir(dir);
-  }
-  closedir(dir);
-  chdir(sel);
-  qsort(bufferArray, dircount, sizeof(char *), compFunc);
-}
-
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   t_state * state = malloc(sizeof(t_state));
   int c;
-  int dirCount = countDir(argv[1]);
   int selected = 0;
   char cwd[256];
 
-  state->tty = fopen("/dev/tty", "w");
+  state->viewHidden = 0;
+  int dirCount = countDir(argv[1], state->viewHidden);
   state->dirCount = &dirCount;
   state->selected = &selected;
+  state->tty = fopen("/dev/tty", "w");
   state->bufferArray = malloc(sizeof(char *) * 10000);
   state->cwd = cwd;
 
@@ -121,7 +70,7 @@ int main(int argc, char * argv[]) {
   cfmakeraw(&state->newt);
   tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);
   fprintf(state->tty, "\e[?25l");
-  changeDir(argv[1], state->bufferArray);
+  updateDirList(argv[1], state->bufferArray, 0);
 
   struct actionNode * commands = initDefaultMappings();
 

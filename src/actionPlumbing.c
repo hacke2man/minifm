@@ -2,6 +2,22 @@
 #include "actionPlumbing.h"
 #include <stdlib.h>
 
+//assings a score based on how many letters match in strings
+int matchScore(char * search, char * check)
+{
+  int score = 0;
+  for(int i = 0; i < strlen(check); i++)
+  {
+    if(search[i] == check[i])
+    {
+      score++;
+    } else {
+      break;
+    }
+  }
+  return score;
+}
+
 t_action * initAction(char * combo, int (*function)(t_state *) )
 {
   t_action * newAction;

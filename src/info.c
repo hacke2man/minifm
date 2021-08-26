@@ -1,6 +1,58 @@
 #include "info.h"
+#include <dirent.h>
+#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
+//callback for comparing file names
+int compFunc(const void * a, const void * b)
+{
+  char ** aval = (char **) a;
+  int ascore = 0;
+  if(isDir(*aval))
+    ascore -= 10 ;
+
+  char ** bval = (char **) b;
+  int bscore = 0;
+  if(isDir(*bval))
+    bscore -= 10;
+
+  if(strcmp(*aval, *bval) >= 0)
+    ascore++;
+  else
+    bscore++;
+  
+  return ascore - bscore;
+}
+
+//change proccess dir
+void updateDirList(char * sel, char  ** bufferArray, int viewHidden)
+{
+  int dircount = countDir(sel, viewHidden);
+  DIR * dir;
+  if( sel == NULL || strlen(sel) == 0)
+    dir =opendir(".");
+  else
+    dir = opendir(sel);
+
+  dircount = countDir(sel, viewHidden);
+  struct dirent * ent;
+  ent = readdir(dir);
+
+  int ind = 0;
+  while(ent != NULL){
+    if(ent->d_name[0] != '.' || viewHidden)
+    {
+      bufferArray[ind] = malloc(sizeof(ent->d_name));
+      memset(bufferArray[ind], '\0', sizeof(ent->d_name));
+      strcpy(bufferArray[ind], ent->d_name);
+      ind++;
+    }
+    ent = readdir(dir);
+  }
+  closedir(dir);
+  qsort(bufferArray, dircount, sizeof(char *), compFunc);
+}
 //determin how many remaining files can be drawn
 //TODO: allow for custom view range
 int getEnd(int selected, int total)
@@ -34,7 +86,7 @@ int getStart(int selected, int total)
 #include <sys/stat.h>
 
 //count files in dir
-int countDir(char * path)
+int countDir(char * path, int viewHidden)
 {
   static int count = 0;
   count++;
@@ -48,7 +100,7 @@ int countDir(char * path)
 
   int dirCount = 0;
   while ((ent = readdir(dir))) {
-    if(ent->d_name[0] != '.')
+    if(ent->d_name[0] != '.' || viewHidden)
       dirCount++;
   }
   closedir(dir);

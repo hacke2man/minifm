@@ -13,6 +13,7 @@ typedef struct state{
  char ** bufferArray;
  char * cwd;
  FILE * tty;
+ int viewHidden;
  struct termios oldt;
  struct termios newt;
 } t_state;

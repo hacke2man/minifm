@@ -8,20 +8,15 @@
 
 #include "actionPlumbing.h"
 
-//assings a score based on how many letters match in strings
-int matchScore(char * search, char * check)
+int toggleHidden(t_state * state)
 {
-  int score = 0;
-  for(int i = 0; i < strlen(check); i++)
-  {
-    if(search[i] == check[i])
-    {
-      score++;
-    } else {
-      break;
-    }
-  }
-  return score;
+  float newsel = (float)*state->selected / (float)*state->dirCount;
+  state->viewHidden = !state->viewHidden;
+  *state->dirCount = countDir(state->cwd, state->viewHidden);
+  *state->selected = (int)(newsel * *state->dirCount);
+  
+  updateDirList(state->cwd, state->bufferArray, state->viewHidden);
+  return 0;
 }
 
 //Match user input against file list. output file name if user hits enter
@@ -161,6 +156,11 @@ int startSearch(t_state * state)
   return Search(state);
 }
 
+//TODO: make dd delete file under cursor
+//TODO: implement yank, and put
+//TODO: visual mode
+//TODO: insert mode to rename files
+//TODO: hide/show hidden files
 struct actionNode * initDefaultMappings()
 {
   struct actionNode * commands;
@@ -173,15 +173,11 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction("gg", gotoTop));
   listQueue(commands, initAction("G", gotoBottom));
   listQueue(commands, initAction("b", backDir));
+  listQueue(commands, initAction(" h", toggleHidden));
   return commands;
 }
 
 //TODO: implement system for adding counts to commands
-//TODO: make dd delete file under cursor
-//TODO: implement yank, and put
-//TODO: visual mode
-//TODO: insert mode to rename files
-//TODO: hide/show hidden files
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};

@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include "types.h"
 
+int matchScore(char * search, char * check);
 t_action * initAction(char * combo, int (*function)(t_state *) );
 int matchScore(char * search, char * check);
 int Search(t_state * state);
