@@ -55,7 +55,7 @@ int main(int argc, char * argv[]) {
   t_state * state = malloc(sizeof(t_state));
   int c;
   int selected = 0;
-  char cwd[256];
+  char cwd[PATH_MAX];
 
   state->viewHidden = 0;
   int dirCount = countDir(argv[1], state->viewHidden);

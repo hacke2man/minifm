@@ -80,7 +80,7 @@ int enter(t_state * state)
   char * cwd = state->cwd;
   FILE * tty = state->tty;
 
-  char * sel = malloc(sizeof(bufferArray[*selected]));
+  char * sel = malloc(sizeof(char) * (strlen(bufferArray[*selected]) + 1));
   strcpy(sel, bufferArray[*selected]);
   *selected = 0;
 
