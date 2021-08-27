@@ -11,6 +11,7 @@ typedef struct state{
  int * dirCount;
  int * selected;
  char ** bufferArray;
+ char ** deletedFiles;
  char * cwd;
  FILE * tty;
  int viewHidden;

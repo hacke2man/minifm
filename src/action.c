@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "action.h"
 #include <sys/wait.h>
 #include <stdlib.h>
@@ -15,7 +16,7 @@ int toggleHidden(t_state * state)
   *state->dirCount = countDir(state->cwd, state->viewHidden);
   *state->selected = (int)(newsel * *state->dirCount);
   
-  updateDirList(state->cwd, state->bufferArray, state->viewHidden);
+  updateDirList(state->bufferArray, state->viewHidden);
   return 0;
 }
 
@@ -156,11 +157,41 @@ int startSearch(t_state * state)
   return Search(state);
 }
 
-//TODO: make dd delete file under cursor
-//TODO: implement yank, and put
+int removeFile(t_state * state)
+{
+  // printf("%s",state->bufferArray[*state->selected]);
+  remove(state->bufferArray[*state->selected]);
+  // updateDirList(state->bufferArray, state->viewHidden);
+  return 1;
+}
+
+int yank(t_state * state)
+{
+  char yankListPath[PATH_MAX];
+  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
+  FILE * yankList = fopen(yankListPath, "w");
+  fprintf(yankList, "%s/%s", state->cwd, state->bufferArray[*state->selected]);
+  return 1;
+}
+
+int put(t_state * state)
+{
+  char yankListPath[PATH_MAX];
+  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
+  FILE * yankList = fopen(yankListPath, "r");
+  char putFile[PATH_MAX];
+  fgets(putFile, PATH_MAX, yankList);
+
+  char command[2*PATH_MAX + 1];
+  sprintf(command, "cp -r %s %s", putFile, state->cwd);
+  system(command);
+
+  // updateDirList(state->bufferArray, state->viewHidden);
+  return 1;
+}
+
 //TODO: visual mode
 //TODO: insert mode to rename files
-//TODO: hide/show hidden files
 struct actionNode * initDefaultMappings()
 {
   struct actionNode * commands;
@@ -174,6 +205,9 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction("G", gotoBottom));
   listQueue(commands, initAction("b", backDir));
   listQueue(commands, initAction(" h", toggleHidden));
+  listQueue(commands, initAction("dd", removeFile));
+  listQueue(commands, initAction("yy", yank));
+  listQueue(commands, initAction("p", put));
   return commands;
 }
 

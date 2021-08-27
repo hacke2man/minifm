@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 int countDir(char * path, int viewHidden);
-void updateDirList(char * sel, char  ** bufferArray, int viewHidden);
+void updateDirList(char  ** bufferArray, int viewHidden);
 int isDir(char * folder);
 int getEnd(int selected, int total);
 int getStart(int selected, int total);

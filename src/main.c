@@ -70,7 +70,7 @@ int main(int argc, char * argv[]) {
   cfmakeraw(&state->newt);
   tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);
   fprintf(state->tty, "\e[?25l");
-  updateDirList(argv[1], state->bufferArray, 0);
+  updateDirList(state->bufferArray, 0);
 
   struct actionNode * commands = initDefaultMappings();
 

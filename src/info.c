@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 //callback for comparing file names
 int compFunc(const void * a, const void * b)
@@ -26,19 +27,19 @@ int compFunc(const void * a, const void * b)
 }
 
 //change proccess dir
-void updateDirList(char * sel, char  ** bufferArray, int viewHidden)
+//TODO: notice deleted/added files after process is launched
+//possible do this by having an update string array so it can keep
+//track of everything on its own
+void updateDirList(char  ** bufferArray, int viewHidden)
 {
-  int dircount = countDir(sel, viewHidden);
+  int dircount = countDir(".", viewHidden);
   DIR * dir;
-  if( sel == NULL || strlen(sel) == 0)
-    dir =opendir(".");
-  else
-    dir = opendir(sel);
+  dir = opendir(".");
+  FILE * crash;
 
-  dircount = countDir(sel, viewHidden);
+  dircount = countDir(".", viewHidden);
   struct dirent * ent;
   ent = readdir(dir);
-
   int ind = 0;
   while(ent != NULL){
     if(ent->d_name[0] != '.' || viewHidden)
@@ -53,6 +54,7 @@ void updateDirList(char * sel, char  ** bufferArray, int viewHidden)
   closedir(dir);
   qsort(bufferArray, dircount, sizeof(char *), compFunc);
 }
+
 //determin how many remaining files can be drawn
 //TODO: allow for custom view range
 int getEnd(int selected, int total)
