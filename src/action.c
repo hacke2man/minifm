@@ -13,10 +13,17 @@ int toggleHidden(t_state * state)
 {
   float newsel = (float)*state->selected / (float)*state->dirCount;
   state->viewHidden = !state->viewHidden;
-  *state->dirCount = countDir(state->cwd, state->viewHidden);
+  *state->dirCount = countDir(state);
+  state->selected = malloc(sizeof(int) * *state->dirCount + 1);
+
+  free(state->selected);
+  for(int i = 1; i < *state->dirCount + 1; i++)
+  {
+    state->selected[i] = -1;
+  }
   *state->selected = (int)(newsel * *state->dirCount);
   
-  updateDirList(state->bufferArray, state->viewHidden);
+  updateDirList(state);
   return 0;
 }
 
@@ -152,16 +159,11 @@ int backDir(t_state * state)
   exit(0);
 }
 
-int startSearch(t_state * state)
-{
-  return Search(state);
-}
-
 int removeFile(t_state * state)
 {
   // printf("%s",state->bufferArray[*state->selected]);
   remove(state->bufferArray[*state->selected]);
-  // updateDirList(state->bufferArray, state->viewHidden);
+  updateDirList(state);
   return 1;
 }
 
@@ -186,11 +188,117 @@ int put(t_state * state)
   sprintf(command, "cp -r %s %s", putFile, state->cwd);
   system(command);
 
-  // updateDirList(state->bufferArray, state->viewHidden);
+  // updateDirList(state);
   return 1;
 }
 
-//TODO: visual mode
+int compareInt(const void * a, const void * b)
+{
+  return *(int *)a - *(int *)b;
+}
+
+//FIXME: change to mode
+int Visual(t_state * state)
+{
+  char ** bufferArray = state->bufferArray;
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
+  char tmp[2] = {' ', '\0'};
+  char search[256];
+  search[0] = '\0';
+  int bestScore = 0;
+  int bestMatchIndex = 0;
+  int currentScore = 0;
+  int numMatch = 0;
+  int topOfSelection = 0;
+  while(1)
+  {
+    tmp[0] = getchar();
+
+    int i = 0;
+    for(; selected[i] != -1; i++){}
+    if(tmp[0] == 27)
+    {
+      selected[1] = -1;
+      for(int i = 1; i < *dirCount; i++)
+        selected[i] = -1;
+      return 0;
+
+    } else if(tmp[0] == '\r') {
+      int i = 0;
+      for(; selected[i] != -1; i++){
+        printf("%d,", selected[i]);
+      }
+      getchar();
+      return 0;
+
+    } else if ( tmp[0] == 'j')
+    {
+      if(topOfSelection && selected[i-1] < *dirCount)
+      {
+        if(selected[1] == -1)
+        {
+          topOfSelection = !topOfSelection;
+          selected[i] = *state->selected + i;
+        } else {
+          for(int i = 0; selected[i] != -1; i++)
+            selected[i] = selected[i + 1];
+        }
+
+      } else if(selected[i-1] < *dirCount - 1) {
+        selected[i] = *state->selected + i;
+      }
+
+    } else if ( tmp[0] == 'k') {
+      if(topOfSelection && *selected > 0)
+      {
+        int tmp = selected[0];
+        int tmp2;
+        selected[0] = selected[0] - 1;
+        int i = 1;
+        for(; selected[i] != -1; i++)
+        {
+          tmp2 = selected[i];
+          selected[i] = tmp;
+          tmp = tmp2;
+        }
+        tmp2 = selected[i];
+        selected[i] = tmp;
+
+      } else if(*selected > 0) {
+        if(selected[i-1] == *selected)
+        {
+          topOfSelection = !topOfSelection;
+        int tmp = selected[0];
+        int tmp2;
+        selected[0] = selected[0] - 1;
+        int i = 1;
+        for(; selected[i] != -1; i++)
+        {
+          tmp2 = selected[i];
+          selected[i] = tmp;
+          tmp = tmp2;
+        }
+        tmp2 = selected[i];
+        selected[i] = tmp;
+
+        } else {
+          int i = 0;
+          for(; selected[i] != -1; i++){}
+            selected[i - 1] = -1;
+        }
+      }
+
+    }else if(tmp[0] == 'o')
+      topOfSelection = !topOfSelection;
+    draw(state);
+  }
+  return 0;
+}
+
+//TODO: visual modes
 //TODO: insert mode to rename files
 struct actionNode * initDefaultMappings()
 {
@@ -198,7 +306,7 @@ struct actionNode * initDefaultMappings()
 
   commands = initList(initAction("\x1b", exitProgram));
   listQueue(commands, initAction("\r", enter));
-  listQueue(commands, initAction("/", startSearch));
+  listQueue(commands, initAction("/", Search));
   listQueue(commands, initAction("j", moveDown));
   listQueue(commands, initAction("k", moveUp));
   listQueue(commands, initAction("gg", gotoTop));
@@ -208,9 +316,11 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction("dd", removeFile));
   listQueue(commands, initAction("yy", yank));
   listQueue(commands, initAction("p", put));
+  listQueue(commands, initAction("v", Visual));
   return commands;
 }
 
+//TODO: implement modes
 //TODO: implement system for adding counts to commands
 int input(t_state * state, struct actionNode * commands)
 {

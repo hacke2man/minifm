@@ -1,9 +1,9 @@
-#include "info.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include "info.h"
 
 //callback for comparing file names
 int compFunc(const void * a, const void * b)
@@ -30,25 +30,40 @@ int compFunc(const void * a, const void * b)
 //TODO: notice deleted/added files after process is launched
 //possible do this by having an update string array so it can keep
 //track of everything on its own
-void updateDirList(char  ** bufferArray, int viewHidden)
+void updateDirList(t_state * state)
 {
-  int dircount = countDir(".", viewHidden);
-  DIR * dir;
-  dir = opendir(".");
-  FILE * crash;
+  int viewHidden = state->viewHidden;
+  char ** bufferArray = state->bufferArray;
 
-  dircount = countDir(".", viewHidden);
+  int dircount = countDir(state);
+  DIR * dir;
+  dir = opendir(state->cwd);
+  if(!dir)
+    exit(1);
+  FILE * canOpen;
+  char canOpenPath[PATH_MAX];
+
+  dircount = countDir(state);
   struct dirent * ent;
   ent = readdir(dir);
   int ind = 0;
   while(ent != NULL){
-    if(ent->d_name[0] != '.' || viewHidden)
+    sprintf(canOpenPath, "%s/%s", state->cwd, ent->d_name);
+    canOpen = fopen(canOpenPath, "r");
+    if(!canOpen)
+    {
+      printf("fail");
+      getchar();
+    }
+
+    if((ent->d_name[0] != '.' || viewHidden) && canOpen)
     {
       bufferArray[ind] = malloc(sizeof(ent->d_name));
       memset(bufferArray[ind], '\0', sizeof(ent->d_name));
       strcpy(bufferArray[ind], ent->d_name);
       ind++;
     }
+    fclose(canOpen);
     ent = readdir(dir);
   }
   closedir(dir);
@@ -88,22 +103,32 @@ int getStart(int selected, int total)
 #include <sys/stat.h>
 
 //count files in dir
-int countDir(char * path, int viewHidden)
+int countDir(t_state * state)
 {
+  int viewHidden = state->viewHidden;
   static int count = 0;
   count++;
   DIR * dir;
-  if(path == NULL || strlen(path) == 0)
-    dir =opendir(".");
-  else
-    dir = opendir(path);
+  dir =opendir(".");
 
   struct dirent * ent;
+  FILE * canOpen;
+  char canOpenPath[PATH_MAX];
 
   int dirCount = 0;
   while ((ent = readdir(dir))) {
-    if(ent->d_name[0] != '.' || viewHidden)
+    sprintf(canOpenPath, "%s/%s", state->cwd, ent->d_name);
+    canOpen = fopen(canOpenPath, "r");
+    if(!canOpen)
+    {
+      printf("%s", state->cwd);
+      getchar();
+    }
+
+    if((ent->d_name[0] != '.' || viewHidden) && canOpen)
+    // if(ent->d_name[0] != '.' || viewHidden)
       dirCount++;
+    fclose(canOpen);
   }
   closedir(dir);
   return dirCount;

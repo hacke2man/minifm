@@ -24,6 +24,12 @@ typedef struct {
   int (*function)(t_state * state);
 } t_action;
 
+enum modes {
+  NORMAL,
+  INSERT,
+  VISUAL,
+};
+
 struct actionNode {
   t_action * action;
   struct actionNode * nextNode;
