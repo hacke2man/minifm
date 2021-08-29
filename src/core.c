@@ -61,7 +61,7 @@ int canMatch(mode mode, char * combo, struct actionNode * head)
   int matchable = 0;
   while (head)
   {
-    if(strlen(combo) <= strlen(head->action->combo) && head->action->mode == mode)
+    if(strlen(combo) <= strlen(head->action->combo) && (head->action->mode & mode) > 0)
     {
       for(int j = 0; j < strlen(combo); j++)
       {
@@ -76,7 +76,6 @@ int canMatch(mode mode, char * combo, struct actionNode * head)
   return matchable;
 }
 
-//TODO: visual modes
 //TODO: insert mode to rename files
 //FIXME: randomly crashes program
 struct actionNode * initDefaultMappings()
@@ -93,7 +92,7 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
   listQueue(commands, initAction(NORMAL, "dd", removeFile));
-  listQueue(commands, initAction(NORMAL, "yy", yank));
+  listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
@@ -106,7 +105,10 @@ struct actionNode * initDefaultMappings()
   return commands;
 }
 
+<<<<<<< Updated upstream
 //TODO: implement modes
+=======
+>>>>>>> Stashed changes
 //TODO: implement system for adding counts to commands
 int input(t_state * state, struct actionNode * commands)
 {
@@ -128,7 +130,11 @@ int input(t_state * state, struct actionNode * commands)
 
     while(commandPointer != NULL)
     {
+<<<<<<< Updated upstream
       if (strcmp(combo, commandPointer->action->combo) == 0 && commandPointer->action->mode == state->mode)
+=======
+      if (strcmp(combo, commandPointer->action->combo) == 0 && (commandPointer->action->mode & state->mode) > 0)
+>>>>>>> Stashed changes
       {
         return commandPointer->action->function(state);
       }
