@@ -40,30 +40,20 @@ void updateDirList(t_state * state)
   dir = opendir(state->cwd);
   if(!dir)
     exit(1);
-  FILE * canOpen;
-  char canOpenPath[PATH_MAX];
 
   dircount = countDir(state);
   struct dirent * ent;
   ent = readdir(dir);
   int ind = 0;
   while(ent != NULL){
-    sprintf(canOpenPath, "%s/%s", state->cwd, ent->d_name);
-    canOpen = fopen(canOpenPath, "r");
-    if(!canOpen)
-    {
-      printf("fail");
-      getchar();
-    }
 
-    if((ent->d_name[0] != '.' || viewHidden) && canOpen)
+    if(ent->d_name[0] != '.' || viewHidden)
     {
       bufferArray[ind] = malloc(sizeof(ent->d_name));
       memset(bufferArray[ind], '\0', sizeof(ent->d_name));
       strcpy(bufferArray[ind], ent->d_name);
       ind++;
     }
-    fclose(canOpen);
     ent = readdir(dir);
   }
   closedir(dir);
@@ -109,26 +99,15 @@ int countDir(t_state * state)
   static int count = 0;
   count++;
   DIR * dir;
-  dir =opendir(".");
+  dir = opendir(".");
 
   struct dirent * ent;
-  FILE * canOpen;
-  char canOpenPath[PATH_MAX];
 
   int dirCount = 0;
   while ((ent = readdir(dir))) {
-    sprintf(canOpenPath, "%s/%s", state->cwd, ent->d_name);
-    canOpen = fopen(canOpenPath, "r");
-    if(!canOpen)
-    {
-      printf("%s", state->cwd);
-      getchar();
-    }
-
-    if((ent->d_name[0] != '.' || viewHidden) && canOpen)
+    if(ent->d_name[0] != '.' || viewHidden)
     // if(ent->d_name[0] != '.' || viewHidden)
       dirCount++;
-    fclose(canOpen);
   }
   closedir(dir);
   return dirCount;
