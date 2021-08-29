@@ -5,53 +5,11 @@
 #include <unistd.h>
 #include <termios.h>
 
-#include "info.h"
 #include "action.h"
+#include "info.h"
 #include "types.h"
 #include "actionPlumbing.h"
-
-
-//draws to terminal
-//TODO: add option to show git info
-//TODO: refactor
-void draw(t_state * state)
-{
-  char ** bufferArray = state->bufferArray;
-  int * selected = state->selected;
-  int dirCount = *state->dirCount;
-  char * cwd = state->cwd;
-  FILE * tty = state->tty;
-  char color_str[255] = {'\0'};
-  int color;
-  char lineNum[255];
-  fprintf(tty, "\033[J");
-  for(int i = getStart(*selected,  dirCount);
-      i < getEnd(*selected,  dirCount);
-      i++)
-  {
-    color = 37;
-    sprintf(color_str, "");
-    sprintf(lineNum, "\e[0;90m%d\e[0m", *selected - i > 0 ? *selected - i : (*selected - i) * (0 - 1));
-
-    if(isDir(bufferArray[i]))
-    {
-      color = 34;
-      sprintf(color_str, "\e[%dm" , color);
-    }
-
-    for(int j = 0; selected[j] != -1; j++){
-      if(i == selected[j])
-      {
-        sprintf(color_str, "\e[%d;30m" , color + 10);
-        sprintf(lineNum, "\e[30;100m%d", i + 1);
-        break;
-      }
-    }
-
-    fprintf(tty, "\033[K%s %s%s\e[0m\n\r", lineNum, color_str, bufferArray[i]);
-  }
-  fprintf(tty, "\033[%dA", getEnd(*selected, dirCount) - getStart(*selected, dirCount));
-}
+#include "core.h"
 
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {

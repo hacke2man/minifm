@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include "string.h"
 #include "info.h"
-
 #include "actionPlumbing.h"
+#include "core.h"
 
 int toggleHidden(t_state * state)
 {
@@ -197,7 +197,8 @@ int compareInt(const void * a, const void * b)
   return *(int *)a - *(int *)b;
 }
 
-//FIXME: change to mode
+//TODO: change to mode
+//FIXME: randomly crashes program
 int Visual(t_state * state)
 {
   char ** bufferArray = state->bufferArray;
@@ -294,61 +295,6 @@ int Visual(t_state * state)
     }else if(tmp[0] == 'o')
       topOfSelection = !topOfSelection;
     draw(state);
-  }
-  return 0;
-}
-
-//TODO: visual modes
-//TODO: insert mode to rename files
-struct actionNode * initDefaultMappings()
-{
-  struct actionNode * commands;
-
-  commands = initList(initAction("\x1b", exitProgram));
-  listQueue(commands, initAction("\r", enter));
-  listQueue(commands, initAction("/", Search));
-  listQueue(commands, initAction("j", moveDown));
-  listQueue(commands, initAction("k", moveUp));
-  listQueue(commands, initAction("gg", gotoTop));
-  listQueue(commands, initAction("G", gotoBottom));
-  listQueue(commands, initAction("b", backDir));
-  listQueue(commands, initAction(" h", toggleHidden));
-  listQueue(commands, initAction("dd", removeFile));
-  listQueue(commands, initAction("yy", yank));
-  listQueue(commands, initAction("p", put));
-  listQueue(commands, initAction("v", Visual));
-  return commands;
-}
-
-//TODO: implement modes
-//TODO: implement system for adding counts to commands
-int input(t_state * state, struct actionNode * commands)
-{
-  char tmp[2] = {' ', '\0'};
-  char combo[256];
-  combo[0] = '\0';
-
-  struct actionNode * commandPointer;
-  commandPointer = commands;
-  while(1)
-  {
-    tmp[0] = getchar();
-    strcat(combo, tmp);
-
-    if (!canMatch(combo, commandPointer))
-    {
-      return 0;
-    }
-
-    while(commandPointer != NULL)
-    {
-      if (strcmp(combo, commandPointer->action->combo) == 0)
-      {
-        return commandPointer->action->function(state);
-      }
-      commandPointer = commandPointer->nextNode;
-    }
-    commandPointer = commands;
   }
   return 0;
 }

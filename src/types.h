@@ -19,16 +19,17 @@ typedef struct state{
  struct termios newt;
 } t_state;
 
+typedef enum{
+  NORMAL = 1,
+  INSERT = 2,
+  VISUAL = 4,
+} mode;
+
 typedef struct {
+  mode * mode;
   char * combo;
   int (*function)(t_state * state);
 } t_action;
-
-enum modes {
-  NORMAL,
-  INSERT,
-  VISUAL,
-};
 
 struct actionNode {
   t_action * action;
