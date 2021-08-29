@@ -105,10 +105,6 @@ struct actionNode * initDefaultMappings()
   return commands;
 }
 
-<<<<<<< Updated upstream
-//TODO: implement modes
-=======
->>>>>>> Stashed changes
 //TODO: implement system for adding counts to commands
 int input(t_state * state, struct actionNode * commands)
 {
@@ -130,11 +126,7 @@ int input(t_state * state, struct actionNode * commands)
 
     while(commandPointer != NULL)
     {
-<<<<<<< Updated upstream
-      if (strcmp(combo, commandPointer->action->combo) == 0 && commandPointer->action->mode == state->mode)
-=======
       if (strcmp(combo, commandPointer->action->combo) == 0 && (commandPointer->action->mode & state->mode) > 0)
->>>>>>> Stashed changes
       {
         return commandPointer->action->function(state);
       }
