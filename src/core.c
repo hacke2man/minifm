@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "action.h"
 #include "actionPlumbing.h"
@@ -17,8 +18,18 @@ void draw(t_state * state)
   int color;
   char lineNum[255];
   fprintf(tty, "\033[J");
-  for(int i = getStart(*selected,  dirCount);
-      i < getEnd(*selected,  dirCount);
+  int cursorLocation;
+  if(state->topOfSelection)
+  {
+    cursorLocation = selected[0];
+  } else {
+    int i = 0;
+    for(; selected[i] != -1; i++){}
+    cursorLocation = selected[i - 1];
+  }
+
+  for(int i = getStart(cursorLocation,  dirCount);
+      i < getEnd(cursorLocation,  dirCount);
       i++)
   {
     color = 37;
@@ -67,6 +78,7 @@ int canMatch(mode mode, char * combo, struct actionNode * head)
 
 //TODO: visual modes
 //TODO: insert mode to rename files
+//FIXME: randomly crashes program
 struct actionNode * initDefaultMappings()
 {
   struct actionNode * commands;
@@ -86,39 +98,43 @@ struct actionNode * initDefaultMappings()
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
   listQueue(commands, initAction(VISUAL, "\x1b", escapeVisual));
+  listQueue(commands, initAction(VISUAL, "j", visualMoveDown));
+  listQueue(commands, initAction(VISUAL, "k", visualMoveUp));
+  listQueue(commands, initAction(VISUAL, "o", changeSelectionPos));
+  listQueue(commands, initAction(VISUAL, "\r", printSelected));
 
   return commands;
 }
 
 //TODO: implement modes
-  //TODO: implement system for adding counts to commands
-  int input(t_state * state, struct actionNode * commands)
+//TODO: implement system for adding counts to commands
+int input(t_state * state, struct actionNode * commands)
+{
+  char tmp[2] = {' ', '\0'};
+  char combo[256];
+  combo[0] = '\0';
+
+  struct actionNode * commandPointer;
+  commandPointer = commands;
+  while(1)
   {
-    char tmp[2] = {' ', '\0'};
-    char combo[256];
-    combo[0] = '\0';
+    tmp[0] = getchar();
+    strcat(combo, tmp);
 
-    struct actionNode * commandPointer;
-    commandPointer = commands;
-    while(1)
+    if (!canMatch(state->mode, combo, commandPointer))
     {
-      tmp[0] = getchar();
-      strcat(combo, tmp);
-
-      if (!canMatch(state->mode, combo, commandPointer))
-      {
-        return 0;
-      }
-
-      while(commandPointer != NULL)
-      {
-        if (strcmp(combo, commandPointer->action->combo) == 0 && commandPointer->action->mode == state->mode)
-        {
-          return commandPointer->action->function(state);
-        }
-        commandPointer = commandPointer->nextNode;
-      }
-      commandPointer = commands;
+      return 0;
     }
-    return 0;
+
+    while(commandPointer != NULL)
+    {
+      if (strcmp(combo, commandPointer->action->combo) == 0 && commandPointer->action->mode == state->mode)
+      {
+        return commandPointer->action->function(state);
+      }
+      commandPointer = commandPointer->nextNode;
+    }
+    commandPointer = commands;
+  }
+  return 0;
 }

@@ -21,6 +21,7 @@ typedef struct state{
   char ** deletedFiles;
   char * cwd;
   FILE * tty;
+  int topOfSelection;
   int viewHidden;
   struct termios oldt;
   struct termios newt;

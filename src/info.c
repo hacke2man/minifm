@@ -42,6 +42,14 @@ void updateDirList(t_state * state)
     exit(1);
 
   dircount = countDir(state);
+
+  int tmp = *state->selected;
+  free(state->selected);
+  state->selected = malloc(sizeof(int) * dircount + 1);
+  state->selected[0] = tmp;
+  for(int i = 1; i <= countDir(state); i++)
+    state->selected[i] = -1;
+
   struct dirent * ent;
   ent = readdir(dir);
   int ind = 0;

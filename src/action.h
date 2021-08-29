@@ -23,6 +23,12 @@ int put(t_state * state);
 int Visual(t_state * state);
 int escapeVisual(t_state * state);
 int enterVisual(t_state * state);
+int escapeVisual(t_state * state);
+int enterVisual(t_state * state);
+int visualMoveDown(t_state * state);
+int visualMoveUp(t_state * state);
+int changeSelectionPos(t_state * state);
+int printSelected(t_state * state);
 
 #ifdef __cplusplus
 }
