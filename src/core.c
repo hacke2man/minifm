@@ -77,7 +77,6 @@ int canMatch(mode mode, char * combo, struct actionNode * head)
 }
 
 //TODO: insert mode to rename files
-//FIXME: randomly crashes program
 struct actionNode * initDefaultMappings()
 {
   struct actionNode * commands;
@@ -91,8 +90,8 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "G", gotoBottom));
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
-  listQueue(commands, initAction(NORMAL, "dd", removeFile));
-  listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
+  listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
+  listQueue(commands, initAction(NORMAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));

@@ -258,8 +258,8 @@ int Search(t_state * state)
 
   int removeFile(t_state * state)
   {
-    // printf("%s",state->bufferArray[*state->selected]);
-    remove(state->bufferArray[*state->selected]);
+    for(int i = 0; state->selected[i] != -1; i++)
+      remove(state->bufferArray[state->selected[i]]);
     updateDirList(state);
     return 1;
   }
