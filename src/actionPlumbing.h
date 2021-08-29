@@ -7,10 +7,9 @@ extern "C" {
 #include "types.h"
 
 int matchScore(char * search, char * check);
-t_action * initAction(char * combo, int (*function)(t_state *) );
+t_action * initAction(mode mode, char * combo, int (*function)(t_state *) );
 int matchScore(char * search, char * check);
 int Search(t_state * state);
-int canMatch(char * combo, struct actionNode * head);
 void listQueue(struct actionNode * commands, t_action * action);
 struct actionNode * initList(t_action * action);
 

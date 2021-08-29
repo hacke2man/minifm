@@ -7,26 +7,27 @@ extern "C" {
 #include <stdio.h>
 #include <termios.h>
 
-typedef struct state{
- int * dirCount;
- int * selected;
- char ** bufferArray;
- char ** deletedFiles;
- char * cwd;
- FILE * tty;
- int viewHidden;
- struct termios oldt;
- struct termios newt;
-} t_state;
-
 typedef enum{
   NORMAL = 1,
   INSERT = 2,
   VISUAL = 4,
 } mode;
 
+typedef struct state{
+  mode mode;
+  int * dirCount;
+  int * selected;
+  char ** bufferArray;
+  char ** deletedFiles;
+  char * cwd;
+  FILE * tty;
+  int viewHidden;
+  struct termios oldt;
+  struct termios newt;
+} t_state;
+
 typedef struct {
-  mode * mode;
+  mode mode;
   char * combo;
   int (*function)(t_state * state);
 } t_action;

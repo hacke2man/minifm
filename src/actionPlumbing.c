@@ -18,7 +18,7 @@ int matchScore(char * search, char * check)
   return score;
 }
 
-t_action * initAction(char * combo, int (*function)(t_state *) )
+t_action * initAction(mode mode, char * combo, int (*function)(t_state *) )
 {
   t_action * newAction;
 
@@ -28,27 +28,9 @@ t_action * initAction(char * combo, int (*function)(t_state *) )
   int (*fp)(t_state * state) = function;
   newAction->function = malloc(sizeof(&function));
   newAction->function = function;
-  return newAction;
-}
+  newAction->mode = mode;
 
-int canMatch(char * combo, struct actionNode * head)
-{
-  int matchable = 0;
-  while (head)
-  {
-    if(strlen(combo) <= strlen(head->action->combo))
-    {
-      for(int j = 0; j < strlen(combo); j++)
-      {
-        if (combo[j] != head->action->combo[j]) 
-          break;
-        if(j == strlen(combo) - 1)
-          matchable = 1;
-      }
-    }
-    head = head->nextNode;
-  }
-  return matchable;
+  return newAction;
 }
 
 void listQueue(struct actionNode * commands, t_action * action)

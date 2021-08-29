@@ -3,28 +3,6 @@
 #include "actionPlumbing.h"
 #include "info.h"
 
-//TODO: visual modes
-//TODO: insert mode to rename files
-struct actionNode * initDefaultMappings()
-{
-  struct actionNode * commands;
-
-  commands = initList(initAction("\x1b", exitProgram));
-  listQueue(commands, initAction("\r", enter));
-  listQueue(commands, initAction("/", Search));
-  listQueue(commands, initAction("j", moveDown));
-  listQueue(commands, initAction("k", moveUp));
-  listQueue(commands, initAction("gg", gotoTop));
-  listQueue(commands, initAction("G", gotoBottom));
-  listQueue(commands, initAction("b", backDir));
-  listQueue(commands, initAction(" h", toggleHidden));
-  listQueue(commands, initAction("dd", removeFile));
-  listQueue(commands, initAction("yy", yank));
-  listQueue(commands, initAction("p", put));
-  listQueue(commands, initAction("v", Visual));
-  return commands;
-}
-
 //draws to terminal
 //TODO: add option to show git info
 //TODO: refactor
@@ -67,35 +45,80 @@ void draw(t_state * state)
   fprintf(tty, "\033[%dA", getEnd(*selected, dirCount) - getStart(*selected, dirCount));
 }
 
-//TODO: implement modes
-//TODO: implement system for adding counts to commands
-int input(t_state * state, struct actionNode * commands)
+int canMatch(mode mode, char * combo, struct actionNode * head)
 {
-  char tmp[2] = {' ', '\0'};
-  char combo[256];
-  combo[0] = '\0';
-
-  struct actionNode * commandPointer;
-  commandPointer = commands;
-  while(1)
+  int matchable = 0;
+  while (head)
   {
-    tmp[0] = getchar();
-    strcat(combo, tmp);
-
-    if (!canMatch(combo, commandPointer))
+    if(strlen(combo) <= strlen(head->action->combo) && head->action->mode == mode)
     {
-      return 0;
-    }
-
-    while(commandPointer != NULL)
-    {
-      if (strcmp(combo, commandPointer->action->combo) == 0)
+      for(int j = 0; j < strlen(combo); j++)
       {
-        return commandPointer->action->function(state);
+        if (combo[j] != head->action->combo[j])
+          break;
+        if(j == strlen(combo) - 1)
+          matchable = 1;
       }
-      commandPointer = commandPointer->nextNode;
     }
-    commandPointer = commands;
+    head = head->nextNode;
   }
-  return 0;
+  return matchable;
+}
+
+//TODO: visual modes
+//TODO: insert mode to rename files
+struct actionNode * initDefaultMappings()
+{
+  struct actionNode * commands;
+
+  commands = initList(initAction(NORMAL, "\x1b", exitProgram));
+  listQueue(commands, initAction(NORMAL, "\r", enter));
+  listQueue(commands, initAction(NORMAL, "/", Search));
+  listQueue(commands, initAction(NORMAL, "j", moveDown));
+  listQueue(commands, initAction(NORMAL, "k", moveUp));
+  listQueue(commands, initAction(NORMAL, "gg", gotoTop));
+  listQueue(commands, initAction(NORMAL, "G", gotoBottom));
+  listQueue(commands, initAction(NORMAL, "b", backDir));
+  listQueue(commands, initAction(NORMAL, " h", toggleHidden));
+  listQueue(commands, initAction(NORMAL, "dd", removeFile));
+  listQueue(commands, initAction(NORMAL, "yy", yank));
+  listQueue(commands, initAction(NORMAL, "p", put));
+
+  listQueue(commands, initAction(NORMAL, "v", enterVisual));
+  listQueue(commands, initAction(VISUAL, "\x1b", escapeVisual));
+
+  return commands;
+}
+
+//TODO: implement modes
+  //TODO: implement system for adding counts to commands
+  int input(t_state * state, struct actionNode * commands)
+  {
+    char tmp[2] = {' ', '\0'};
+    char combo[256];
+    combo[0] = '\0';
+
+    struct actionNode * commandPointer;
+    commandPointer = commands;
+    while(1)
+    {
+      tmp[0] = getchar();
+      strcat(combo, tmp);
+
+      if (!canMatch(state->mode, combo, commandPointer))
+      {
+        return 0;
+      }
+
+      while(commandPointer != NULL)
+      {
+        if (strcmp(combo, commandPointer->action->combo) == 0 && commandPointer->action->mode == state->mode)
+        {
+          return commandPointer->action->function(state);
+        }
+        commandPointer = commandPointer->nextNode;
+      }
+      commandPointer = commands;
+    }
+    return 0;
 }

@@ -21,6 +21,8 @@ int removeFile(t_state * state);
 int yank(t_state * state);
 int put(t_state * state);
 int Visual(t_state * state);
+int escapeVisual(t_state * state);
+int enterVisual(t_state * state);
 
 #ifdef __cplusplus
 }

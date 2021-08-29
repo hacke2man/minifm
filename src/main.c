@@ -5,10 +5,7 @@
 #include <unistd.h>
 #include <termios.h>
 
-#include "action.h"
 #include "info.h"
-#include "types.h"
-#include "actionPlumbing.h"
 #include "core.h"
 
 //TODO: make system for processing arguments
@@ -24,6 +21,7 @@ int main(int argc, char * argv[]) {
   state->bufferArray = malloc(sizeof(char *) * 10000);
   state->cwd = cwd;
   state->selected = malloc(sizeof(int) * dirCount + 1);
+  state->mode = NORMAL;
 
   for(int i = 1; i < dirCount + 1; i++)
   {
