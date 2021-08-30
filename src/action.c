@@ -65,7 +65,7 @@ int visualMoveDown(t_state * state)
     {
       int i = 1;
       for(; selected[i] != -1 ; i++)
-      selected[i - 1] = selected[i];
+         selected[i - 1] = selected[i];
       selected[i - 1] = -1;
     } else {
       state->topOfSelection = !state->topOfSelection;
@@ -92,9 +92,9 @@ int visualMoveUp(t_state * state)
 
 
     // *selected = *selected > 0 ? *selected - 1 : *selected;
-  if(*selected > 0) {
-    if(*topOfSelection)
-    {
+  if(*topOfSelection)
+  {
+    if(*selected > 0) {
       int tmp = selected[0];
       int tmp2;
       selected[0] = selected[0] - 1;
@@ -107,17 +107,19 @@ int visualMoveUp(t_state * state)
       }
       tmp2 = selected[i];
       selected[i] = tmp;
+    }
 
-    } else {
-      if(selected[i-1] == *selected)
-      {
-        *topOfSelection = !(*topOfSelection);
+  } else {
+    if(selected[i-1] == *selected)
+    {
+      *topOfSelection = !(*topOfSelection);
+      if(*selected > 0) {
         visualMoveUp(state);
-      } else {
-        int i = 0;
-        for(; selected[i] != -1; i++){}
-        selected[i - 1] = -1;
       }
+    } else {
+      int i = 0;
+      for(; selected[i] != -1; i++){}
+      selected[i - 1] = -1;
     }
   }
   return 0;
