@@ -50,6 +50,7 @@ int printSelected(t_state * state)
   return 0;
 }
 
+//TODO:make sure the initial chack matches the regular up and down checks
 int visualMoveDown(t_state * state)
 {
   int * selected = state->selected;
@@ -58,21 +59,24 @@ int visualMoveDown(t_state * state)
   int i = 0;
   for(; selected[i] != -1; i++){}
 
-  if(selected[i - 1] < *dirCount)
+  if(topOfSelection)
   {
-    if(topOfSelection)
+    if(selected[1] != -1)
     {
-      if(selected[1] != -1)
+      int i = 1;
+      for(; selected[i] != -1 ; i++)
+      selected[i - 1] = selected[i];
+      selected[i - 1] = -1;
+    } else {
+      state->topOfSelection = !state->topOfSelection;
+      if(selected[i - 1] < *dirCount - 1)
       {
-        int i = 1;
-        for(; selected[i] != -1 ; i++)
-          selected[i - 1] = selected[i];
-        selected[i - 1] = -1;
-      } else {
-        state->topOfSelection = !state->topOfSelection;
         visualMoveDown(state);
       }
-    } else {
+    }
+  } else {
+    if(selected[i - 1] < *dirCount - 1)
+    {
       selected[i] = selected[i - 1] + 1;
     }
   }
@@ -86,6 +90,8 @@ int visualMoveUp(t_state * state)
   int i = 0;
   for(; selected[i] != -1; i++){}
 
+
+    // *selected = *selected > 0 ? *selected - 1 : *selected;
   if(*selected > 0) {
     if(*topOfSelection)
     {
