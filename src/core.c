@@ -91,7 +91,7 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
   listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
-  listQueue(commands, initAction(NORMAL, "yy", yank));
+  listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));

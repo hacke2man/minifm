@@ -22,7 +22,7 @@ int toggleHidden(t_state * state)
     state->selected[i] = -1;
   }
   *state->selected = (int)(newsel * *state->dirCount);
-  
+
   updateDirList(state);
   return 0;
 }
@@ -31,7 +31,7 @@ int escapeVisual(t_state * state)
 {
   state->selected[1] = -1;
   for(int i = 1; i < *state->dirCount; i++)
-    state->selected[i] = -1;
+  state->selected[i] = -1;
   state->mode = NORMAL;
   state->topOfSelection = 0;
   return 0;
@@ -46,7 +46,7 @@ int enterVisual(t_state * state)
 int printSelected(t_state * state)
 {
   for(int i = 0; i < *state->dirCount; i++)
-    printf("%d", state->selected[i]);
+  printf("%d", state->selected[i]);
   return 0;
 }
 
@@ -65,7 +65,7 @@ int visualMoveDown(t_state * state)
     {
       int i = 1;
       for(; selected[i] != -1 ; i++)
-         selected[i - 1] = selected[i];
+      selected[i - 1] = selected[i];
       selected[i - 1] = -1;
     } else {
       state->topOfSelection = !state->topOfSelection;
@@ -91,7 +91,6 @@ int visualMoveUp(t_state * state)
   for(; selected[i] != -1; i++){}
 
 
-    // *selected = *selected > 0 ? *selected - 1 : *selected;
   if(*topOfSelection)
   {
     if(*selected > 0) {
@@ -184,115 +183,120 @@ int Search(t_state * state)
   }
 }
 
-  //output name of selected file and exit program
-  int enter(t_state * state)
+//output name of selected file and exit program
+int enter(t_state * state)
+{
+  char ** bufferArray = state->bufferArray;
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  char * cwd = state->cwd;
+  FILE * tty = state->tty;
+
+  char * sel = malloc(sizeof(char) * (strlen(bufferArray[*selected]) + 1));
+  strcpy(sel, bufferArray[*selected]);
+  *selected = 0;
+
+  for(int i = 0; i < *dirCount; i++)
+  free(bufferArray[i]);
+
+  fprintf(tty, "\033[J");
+  strcat(cwd, "/");
+  strcat(cwd, sel);
+
+  fprintf(tty, "\e[?25h");
+  printf("%s", cwd);
+  return 1;
+}
+
+int moveDown(t_state * state)
+{
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  *selected = *selected < *dirCount - 1 ? *selected + 1 : *selected;
+  return 0;
+}
+
+int moveUp(t_state * state)
+{
+  int * selected = state->selected;
+  *selected = *selected > 0 ? *selected - 1 : *selected;
+  return 0;
+}
+
+int exitProgram(t_state * state)
+{
+  return 1;
+}
+
+void freeAction(t_action * action)
+{
+  free(action->combo);
+  free(action->function);
+}
+
+int gotoTop(t_state * state)
+{
+  int * selected = state->selected;
+  *selected = 0;
+  return 0;
+}
+
+int gotoBottom(t_state * state){
+  int * selected = state->selected;
+  int * dirCount = state->dirCount;
+  *selected = *dirCount - 1;
+  return 0;
+}
+
+int backDir(t_state * state)
+{
+  char ** bufferArray = state->bufferArray;
+  int * dirCount = state->dirCount;
+  FILE * tty = state->tty;
+  for(int i = 0; i < *dirCount; i++)
+  free(bufferArray[i]);
+
+  fprintf(tty, "\033[J");
+  tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+  fprintf(tty, "\e[?25h");
+  printf("..");
+  exit(0);
+}
+
+int removeFile(t_state * state)
+{
+  for(int i = 0; state->selected[i] != -1; i++)
+  remove(state->bufferArray[state->selected[i]]);
+  updateDirList(state);
+  return 1;
+}
+
+int yank(t_state * state)
+{
+  char yankListPath[PATH_MAX];
+  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
+  FILE * yankList = fopen(yankListPath, "w");
+
+  for(int i = 0; state->selected[i] != -1; i++)
+  fprintf(yankList, "%s/%s\n", state->cwd, state->bufferArray[state->selected[i]]);
+  return 1;
+}
+
+int put(t_state * state)
+{
+  char yankListPath[PATH_MAX];
+  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
+  FILE * yankList = fopen(yankListPath, "r");
+  char putFile[PATH_MAX];
+  char command[2*PATH_MAX + 1];
+  char * newline;
+
+  while(fgets(putFile, PATH_MAX, yankList))
   {
-    char ** bufferArray = state->bufferArray;
-    int * selected = state->selected;
-    int * dirCount = state->dirCount;
-    char * cwd = state->cwd;
-    FILE * tty = state->tty;
-
-    char * sel = malloc(sizeof(char) * (strlen(bufferArray[*selected]) + 1));
-    strcpy(sel, bufferArray[*selected]);
-    *selected = 0;
-
-    for(int i = 0; i < *dirCount; i++)
-      free(bufferArray[i]);
-
-    fprintf(tty, "\033[J");
-    strcat(cwd, "/");
-    strcat(cwd, sel);
-
-    fprintf(tty, "\e[?25h");
-    printf("%s", cwd);
-    return 1;
-  }
-
-  int moveDown(t_state * state)
-  {
-    int * selected = state->selected;
-    int * dirCount = state->dirCount;
-    *selected = *selected < *dirCount - 1 ? *selected + 1 : *selected;
-    return 0;
-  }
-
-  int moveUp(t_state * state)
-  {
-    int * selected = state->selected;
-    *selected = *selected > 0 ? *selected - 1 : *selected;
-    return 0;
-  }
-
-  int exitProgram(t_state * state)
-  {
-    return 1;
-  }
-
-  void freeAction(t_action * action)
-  {
-    free(action->combo);
-    free(action->function);
-  }
-
-  int gotoTop(t_state * state)
-  {
-    int * selected = state->selected;
-    *selected = 0;
-    return 0;
-  }
-
-  int gotoBottom(t_state * state){
-    int * selected = state->selected;
-    int * dirCount = state->dirCount;
-    *selected = *dirCount - 1;
-    return 0;
-  }
-
-  int backDir(t_state * state)
-  {
-    char ** bufferArray = state->bufferArray;
-    int * dirCount = state->dirCount;
-    FILE * tty = state->tty;
-    for(int i = 0; i < *dirCount; i++)
-      free(bufferArray[i]);
-
-    fprintf(tty, "\033[J");
-    tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
-    fprintf(tty, "\e[?25h");
-    printf("..");
-    exit(0);
-  }
-
-  int removeFile(t_state * state)
-  {
-    for(int i = 0; state->selected[i] != -1; i++)
-      remove(state->bufferArray[state->selected[i]]);
-    updateDirList(state);
-    return 1;
-  }
-
-  int yank(t_state * state)
-  {
-    char yankListPath[PATH_MAX];
-    sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
-    FILE * yankList = fopen(yankListPath, "w");
-    fprintf(yankList, "%s/%s", state->cwd, state->bufferArray[*state->selected]);
-    return 1;
-  }
-
-  int put(t_state * state)
-  {
-    char yankListPath[PATH_MAX];
-    sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
-    FILE * yankList = fopen(yankListPath, "r");
-    char putFile[PATH_MAX];
-    fgets(putFile, PATH_MAX, yankList);
-
-    char command[2*PATH_MAX + 1];
+    newline = strchr(putFile, '\n');
+    *newline = '\0';
     sprintf(command, "cp -r %s %s", putFile, state->cwd);
     system(command);
-
-    // updateDirList(state);
-    return 1;
+  }
+  return 1;
 }
