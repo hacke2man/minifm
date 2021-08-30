@@ -27,16 +27,6 @@ int toggleHidden(t_state * state)
   return 0;
 }
 
-int escapeVisual(t_state * state)
-{
-  state->selected[1] = -1;
-  for(int i = 1; i < *state->dirCount; i++)
-  state->selected[i] = -1;
-  state->mode = NORMAL;
-  state->topOfSelection = 0;
-  return 0;
-}
-
 int enterVisual(t_state * state)
 {
   state->mode = VISUAL;
@@ -46,7 +36,7 @@ int enterVisual(t_state * state)
 int printSelected(t_state * state)
 {
   for(int i = 0; i < *state->dirCount; i++)
-  printf("%d", state->selected[i]);
+    printf("%d", state->selected[i]);
   return 0;
 }
 
@@ -65,7 +55,7 @@ int visualMoveDown(t_state * state)
     {
       int i = 1;
       for(; selected[i] != -1 ; i++)
-      selected[i - 1] = selected[i];
+       selected[i - 1] = selected[i];
       selected[i - 1] = -1;
     } else {
       state->topOfSelection = !state->topOfSelection;
@@ -127,6 +117,17 @@ int visualMoveUp(t_state * state)
 int changeSelectionPos(t_state * state)
 {
   state->topOfSelection = !state->topOfSelection;
+  return 0;
+}
+
+int selectOne(t_state * state)
+{
+  int i = 1;
+  for(; state->selected[i] != -1; i++){
+    if(state->selected[i] == state->selected[0])
+      break;
+  }
+  state->selected[i] = state->selected[0];
   return 0;
 }
 
@@ -197,7 +198,7 @@ int enter(t_state * state)
   *selected = 0;
 
   for(int i = 0; i < *dirCount; i++)
-  free(bufferArray[i]);
+    free(bufferArray[i]);
 
   fprintf(tty, "\033[J");
   strcat(cwd, "/");
@@ -223,8 +224,16 @@ int moveUp(t_state * state)
   return 0;
 }
 
-int exitProgram(t_state * state)
+int escape(t_state * state)
 {
+  if(state->selected[1] != -1)
+  {
+    for(int i = 1; i < *state->dirCount; i++)
+      state->selected[i] = -1;
+    state->mode = NORMAL;
+    state->topOfSelection = 0;
+    return 0;
+  }
   return 1;
 }
 
@@ -254,7 +263,7 @@ int backDir(t_state * state)
   int * dirCount = state->dirCount;
   FILE * tty = state->tty;
   for(int i = 0; i < *dirCount; i++)
-  free(bufferArray[i]);
+    free(bufferArray[i]);
 
   fprintf(tty, "\033[J");
   tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
@@ -266,7 +275,7 @@ int backDir(t_state * state)
 int removeFile(t_state * state)
 {
   for(int i = 0; state->selected[i] != -1; i++)
-  remove(state->bufferArray[state->selected[i]]);
+    remove(state->bufferArray[state->selected[i]]);
   updateDirList(state);
   return 1;
 }
@@ -277,8 +286,9 @@ int yank(t_state * state)
   sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
   FILE * yankList = fopen(yankListPath, "w");
 
-  for(int i = 0; state->selected[i] != -1; i++)
-  fprintf(yankList, "%s/%s\n", state->cwd, state->bufferArray[state->selected[i]]);
+  int i = state->mode != VISUAL && state->selected[1] != -1 ? 1 : 0;
+  for(; state->selected[i] != -1; i++)
+    fprintf(yankList, "%s/%s\n", state->cwd, state->bufferArray[state->selected[i]]);
   return 1;
 }
 

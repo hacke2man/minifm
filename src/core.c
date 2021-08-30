@@ -7,6 +7,7 @@
 //draws to terminal
 //TODO: add option to show git info
 //TODO: refactor
+//FIXME: line numbers in selection mode are wrong
 void draw(t_state * state)
 {
   char ** bufferArray = state->bufferArray;
@@ -81,7 +82,7 @@ struct actionNode * initDefaultMappings()
 {
   struct actionNode * commands;
 
-  commands = initList(initAction(NORMAL, "\x1b", exitProgram));
+  commands = initList(initAction(NORMAL | VISUAL, "\x1b", escape));
   listQueue(commands, initAction(NORMAL, "\r", enter));
   listQueue(commands, initAction(NORMAL, "/", Search));
   listQueue(commands, initAction(NORMAL, "j", moveDown));
@@ -90,12 +91,12 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "G", gotoBottom));
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
+  listQueue(commands, initAction(NORMAL, "V", selectOne));
   listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
   listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
-  listQueue(commands, initAction(VISUAL, "\x1b", escapeVisual));
   listQueue(commands, initAction(VISUAL, "j", visualMoveDown));
   listQueue(commands, initAction(VISUAL, "k", visualMoveUp));
   listQueue(commands, initAction(VISUAL, "o", changeSelectionPos));

@@ -12,7 +12,7 @@ int Search(t_state * state);
 int enter(t_state * state);
 int moveDown(t_state * state);
 int moveUp(t_state * state);
-int exitProgram(t_state * state);
+int escape(t_state * state);
 void freeAction(t_action * action);
 int gotoTop(t_state * state);
 int gotoBottom(t_state * state);
@@ -21,14 +21,12 @@ int removeFile(t_state * state);
 int yank(t_state * state);
 int put(t_state * state);
 int Visual(t_state * state);
-int escapeVisual(t_state * state);
-int enterVisual(t_state * state);
-int escapeVisual(t_state * state);
 int enterVisual(t_state * state);
 int visualMoveDown(t_state * state);
 int visualMoveUp(t_state * state);
 int changeSelectionPos(t_state * state);
 int printSelected(t_state * state);
+int selectOne(t_state * state);
 
 #ifdef __cplusplus
 }
