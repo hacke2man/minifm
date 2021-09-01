@@ -25,7 +25,7 @@ void draw(t_state * state)
     cursorLocation = selected[0];
   } else {
     int i = 0;
-    for(; selected[i] != -1; i++){}
+    for(; selected[i] != -1; i++);
     cursorLocation = selected[i - 1];
   }
 
@@ -60,6 +60,10 @@ void draw(t_state * state)
 int canMatch(mode mode, char * combo, struct actionNode * head)
 {
   int matchable = 0;
+  char * cmpCombo;
+
+  for(int i = 0; combo[i] > 48 && combo[i] < 47; i++);
+
   while (head)
   {
     if(strlen(combo) <= strlen(head->action->combo) && (head->action->mode & mode) > 0)
@@ -88,6 +92,7 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "j", moveDown));
   listQueue(commands, initAction(NORMAL, "k", moveUp));
   listQueue(commands, initAction(NORMAL, "gg", gotoTop));
+  listQueue(commands, initAction(NORMAL, "longcombo", gotoTop));
   listQueue(commands, initAction(NORMAL, "G", gotoBottom));
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
@@ -106,6 +111,7 @@ struct actionNode * initDefaultMappings()
 }
 
 //TODO: implement system for adding counts to commands
+//TODO: show combo
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};
@@ -118,6 +124,7 @@ int input(t_state * state, struct actionNode * commands)
   {
     tmp[0] = getchar();
     strcat(combo, tmp);
+    printf("\r%s", combo);
 
     if (!canMatch(state->mode, combo, commandPointer))
     {
@@ -128,6 +135,7 @@ int input(t_state * state, struct actionNode * commands)
     {
       if (strcmp(combo, commandPointer->action->combo) == 0 && (commandPointer->action->mode & state->mode) > 0)
       {
+        printf("\r\033[K");
         return commandPointer->action->function(state);
       }
       commandPointer = commandPointer->nextNode;

@@ -29,6 +29,8 @@ int toggleHidden(t_state * state)
 
 int enterVisual(t_state * state)
 {
+  for(int i = 1; i < *state->dirCount; i++)
+    state->selected[i] = -1;
   state->mode = VISUAL;
   return 0;
 }
@@ -47,7 +49,7 @@ int visualMoveDown(t_state * state)
   int * dirCount = state->dirCount;
   int topOfSelection = state->topOfSelection;
   int i = 0;
-  for(; selected[i] != -1; i++){}
+  for(; selected[i] != -1; i++);
 
   if(topOfSelection)
   {
@@ -78,7 +80,7 @@ int visualMoveUp(t_state * state)
   int * selected = state->selected;
   int * topOfSelection = &state->topOfSelection;
   int i = 0;
-  for(; selected[i] != -1; i++){}
+  for(; selected[i] != -1; i++);
 
 
   if(*topOfSelection)
@@ -107,7 +109,7 @@ int visualMoveUp(t_state * state)
       }
     } else {
       int i = 0;
-      for(; selected[i] != -1; i++){}
+      for(; selected[i] != -1; i++);
       selected[i - 1] = -1;
     }
   }
