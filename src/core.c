@@ -111,7 +111,6 @@ struct actionNode * initDefaultMappings()
 }
 
 //TODO: implement system for adding counts to commands
-//TODO: show combo
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};
@@ -123,6 +122,7 @@ int input(t_state * state, struct actionNode * commands)
   while(1)
   {
     tmp[0] = getchar();
+    if(tmp[0] == 27 && strlen(combo) > 1) return 0;
     strcat(combo, tmp);
     printf("\r%s", combo);
 
