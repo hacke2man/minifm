@@ -29,6 +29,8 @@ int toggleHidden(t_state * state)
 
 int enterVisual(t_state * state)
 {
+  for(int i = 1; i < *state->dirCount; i++)
+    state->selected[i] = -1;
   state->mode = VISUAL;
   return 0;
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "action.h"
 #include "actionPlumbing.h"
@@ -88,6 +89,7 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "j", moveDown));
   listQueue(commands, initAction(NORMAL, "k", moveUp));
   listQueue(commands, initAction(NORMAL, "gg", gotoTop));
+  listQueue(commands, initAction(NORMAL, "longcombo", gotoTop));
   listQueue(commands, initAction(NORMAL, "G", gotoBottom));
   listQueue(commands, initAction(NORMAL, "b", backDir));
   listQueue(commands, initAction(NORMAL, " h", toggleHidden));
@@ -105,30 +107,73 @@ struct actionNode * initDefaultMappings()
   return commands;
 }
 
+void printAfter(t_state * state, char * msg)
+{
+    for(int i = 0; i < *state->dirCount; i++)
+      fprintf(state->tty, "\n");
+    fprintf(state->tty, "%s\n", msg);
+    fprintf(state->tty, "\r\033[J\033[%dA", *state->dirCount + 1);
+}
+
 //TODO: implement system for adding counts to commands
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};
   char combo[256];
   combo[0] = '\0';
+  char countStr[256];
+  char msg[256];
+  int countInt = 1;
 
   struct actionNode * commandPointer;
   commandPointer = commands;
+  int containsNonNum = 0;
   while(1)
   {
     tmp[0] = getchar();
+    if(tmp[0] == 27 && strlen(combo) > 1) return 0;
+
+    if(containsNonNum)
+    {
+      if (tmp[0] >= 48 && tmp[0] <= 57)
+      {
+        combo[0] = '\0';
+        countStr[0] = '\0';
+        continue;
+      }
+    } else {
+      if (tmp[0] >= 48 && tmp[0] <= 57)
+      {
+        strcat(countStr, tmp);
+        countInt = strtol(countStr, NULL, 10);
+        sprintf(msg, "%s%s", countStr, combo);
+        printAfter(state, msg);
+        continue;
+      }
+    }
+    containsNonNum = 1;
     strcat(combo, tmp);
 
     if (!canMatch(state->mode, combo, commandPointer))
     {
+      combo[0] = '\0';
+      countStr[0] = '\0';
       return 0;
     }
+    sprintf(msg, "%s%s", countStr, combo);
+    printAfter(state, msg);
 
     while(commandPointer != NULL)
     {
       if (strcmp(combo, commandPointer->action->combo) == 0 && (commandPointer->action->mode & state->mode) > 0)
       {
-        return commandPointer->action->function(state);
+        for(int i = 0; i < countInt; i++)
+          if(1 == commandPointer->action->function(state))
+            return 1;
+
+        countStr[0] = '\0';
+        combo[0] = '\0';
+        return 0;
       }
       commandPointer = commandPointer->nextNode;
     }
