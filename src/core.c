@@ -9,7 +9,6 @@
 //TODO: add option to show git info
 //TODO: refactor
 //TODO: add colums for line numbers based on dirCount
-//FIXME: line numbers in selection mode are wrong
 void draw(t_state * state)
 {
   char ** bufferArray = state->bufferArray;
