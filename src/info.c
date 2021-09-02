@@ -70,27 +70,30 @@ void updateDirList(t_state * state)
 
 //determin how many remaining files can be drawn
 //TODO: allow for custom view range
-int getEnd(int selected, int total)
+int getEnd(t_state * state)
 {
-  if (total < 10 || selected + 5 > total)
-    return total;
+  if (*state->dirCount < state->viewRange ||
+  *state->selected + state->viewRange/2 > *state->dirCount)
+    return *state->dirCount;
   else
-    return selected < 5 ? 10 : selected + 5;
+    return *state->selected < state->viewRange/2 ?
+    state->viewRange
+    :
+    *state->selected + state->viewRange/2;
 }
 
 //determin how many previous files can be drawn
 //TODO: allow for custom view range
-int getStart(int selected, int total)
+int getStart(t_state * state)
 {
-  if (selected > 5)
+  if (*state->selected > state->viewRange/2)
   {
-    if (total - selected >= 5) return selected - 5;
-    {
-      if(total - 10 < 0)
-        return 0;
-      else
-        return total - 10;
-    }
+    if (*state->dirCount - *state->selected >=  state->viewRange/2)
+      return *state->selected - state->viewRange/2;
+    if(*state->dirCount - state->viewRange < 0)
+      return 0;
+    else
+      return *state->dirCount - state->viewRange;
   }
   else
     return 0;
@@ -115,7 +118,7 @@ int countDir(t_state * state)
   while ((ent = readdir(dir))) {
     if(ent->d_name[0] != '.' || viewHidden)
     // if(ent->d_name[0] != '.' || viewHidden)
-      dirCount++;
+    dirCount++;
   }
   closedir(dir);
   return dirCount;

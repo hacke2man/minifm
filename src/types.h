@@ -23,6 +23,7 @@ typedef struct state{
   FILE * tty;
   int topOfSelection;
   int viewHidden;
+  int viewRange;
   struct termios oldt;
   struct termios newt;
 } t_state;

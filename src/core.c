@@ -30,8 +30,8 @@ void draw(t_state * state)
     cursorLocation = selected[i - 1];
   }
 
-  for(int i = getStart(cursorLocation,  dirCount);
-      i < getEnd(cursorLocation,  dirCount);
+  for(int i = getStart(state);
+      i < getEnd(state);
       i++)
   {
     color = 37;
@@ -55,7 +55,7 @@ void draw(t_state * state)
 
     fprintf(tty, "\033[K%s %s%s\e[0m\n\r", lineNum, color_str, bufferArray[i]);
   }
-  fprintf(tty, "\033[%dA", getEnd(*selected, dirCount) - getStart(*selected, dirCount));
+  fprintf(tty, "\033[%dA", getEnd(state) - getStart(state));
 }
 
 int canMatch(mode mode, char * combo, struct actionNode * head)
@@ -112,10 +112,10 @@ struct actionNode * initDefaultMappings()
 
 void printAfter(t_state * state, char * msg)
 {
-    for(int i = 0; i < getEnd(*state->selected, *state->dirCount); i++)
+    for(int i = 0; i < getEnd(state); i++)
       fprintf(state->tty, "\n");
     fprintf(state->tty, "%s\n", msg);
-    fprintf(state->tty, "\r\033[J\033[%dA", getEnd(*state->selected, *state->dirCount) + 1);
+    fprintf(state->tty, "\r\033[J\033[%dA", getEnd(state) + 1);
 }
 
 int input(t_state * state, struct actionNode * commands)

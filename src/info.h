@@ -9,8 +9,8 @@ extern "C" {
 int countDir(t_state * state);
 void updateDirList(t_state * state);
 int isDir(char * folder);
-int getEnd(int selected, int total);
-int getStart(int selected, int total);
+int getEnd(t_state * state);
+int getStart(t_state * state);
 
 #ifdef __cplusplus
 }
