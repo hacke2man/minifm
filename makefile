@@ -17,4 +17,5 @@ clean:
 	rm build/* a.out
 
 install: all
+	[ -d ~/.local/share/mfm ] || mkdir ~/.local/share/mfm
 	cp a.out /usr/local/bin/minifm
