@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include "action.h"
@@ -18,7 +19,11 @@ void draw(t_state * state)
   FILE * tty = state->tty;
   char color_str[255] = {'\0'};
   int color;
+  int reletiveNumber;
+  int padNum = (int)ceil(log10((double)dirCount + 1));
   char lineNum[255];
+
+  char numberPadding[255];
   fprintf(tty, "\033[J");
   int cursorLocation;
   if(state->topOfSelection)
@@ -36,7 +41,8 @@ void draw(t_state * state)
   {
     color = 37;
     sprintf(color_str, "");
-    sprintf(lineNum, "\e[0;90m%d\e[0m", *selected - i > 0 ? *selected - i : (*selected - i) * (0 - 1));
+    reletiveNumber = *selected - i > 0 ? *selected - i : (*selected - i) * (0 - 1);
+    sprintf(lineNum, "\e[0;90m%*d\e[0m", padNum, reletiveNumber);
 
     if(isDir(bufferArray[i]))
     {
@@ -47,13 +53,13 @@ void draw(t_state * state)
     if(state->topOfSelection)
     {
       if(i == *selected)
-        sprintf(lineNum, "\e[30;100m%d", i + 1);
+        sprintf(lineNum, "\e[30;100m%*d", padNum, i + 1);
     } else {
       int j = 0;
       for(; selected[j] != -1; j++);
 
       if(i == selected[j - 1])
-        sprintf(lineNum, "\e[30;100m%d", i + 1);
+        sprintf(lineNum, "\e[30;100m%*d", padNum, i + 1);
     }
 
     for(int j = 0; selected[j] != -1; j++){
