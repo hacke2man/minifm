@@ -42,7 +42,6 @@ int printSelected(t_state * state)
   return 0;
 }
 
-//TODO:make sure the initial chack matches the regular up and down checks
 int visualMoveDown(t_state * state)
 {
   int * selected = state->selected;
