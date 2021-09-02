@@ -131,10 +131,10 @@ struct actionNode * initDefaultMappings()
 
 void printAfter(t_state * state, char * msg)
 {
-    for(int i = 0; i < getEnd(state); i++)
+    for(int i = 0; i < getEnd(state) - getStart(state); i++)
       fprintf(state->tty, "\n");
     fprintf(state->tty, "%s\n", msg);
-    fprintf(state->tty, "\r\033[J\033[%dA", getEnd(state) + 1);
+    fprintf(state->tty, "\r\033[J\033[%dA", getEnd(state) - getStart(state) + 1);
 }
 
 //TODO: add modmasks
