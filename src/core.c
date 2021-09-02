@@ -45,11 +45,22 @@ void draw(t_state * state)
       sprintf(color_str, "\e[%dm" , color);
     }
 
+    if(state->topOfSelection)
+    {
+      if(i == *selected)
+        sprintf(lineNum, "\e[30;100m%d", i + 1);
+    } else {
+      int j = 0;
+      for(; selected[j] != -1; j++);
+
+      if(i == selected[j - 1])
+        sprintf(lineNum, "\e[30;100m%d", i + 1);
+    }
+
     for(int j = 0; selected[j] != -1; j++){
       if(i == selected[j])
       {
         sprintf(color_str, "\e[%d;30m" , color + 10);
-        sprintf(lineNum, "\e[30;100m%d", i + 1);
         break;
       }
     }

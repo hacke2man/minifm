@@ -246,7 +246,7 @@ int escape(t_state * state)
     for(int i = 1; i < *state->dirCount; i++)
       state->selected[i] = -1;
     state->mode = NORMAL;
-    state->topOfSelection = 0;
+    state->topOfSelection = 1;
     return 0;
   }
   return 1;
