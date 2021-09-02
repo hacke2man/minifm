@@ -23,7 +23,7 @@ int main(int argc, char * argv[]) {
   state->selected = malloc(sizeof(int) * dirCount + 1);
   state->mode = NORMAL;
   state->topOfSelection = 1;
-  state->viewRange = 20;
+  state->viewRange = 12;
 
   for(int i = 1; i < dirCount + 1; i++)
   {
