@@ -225,6 +225,20 @@ int moveUp(t_state * state)
   return 0;
 }
 
+int halfPageDown(t_state * state)
+{
+  for(int i = 0; i < state->viewRange/2; i++)
+    moveDown(state);
+  return 0;
+}
+
+int halfPageUp(t_state * state)
+{
+  for(int i = 0; i < state->viewRange/2; i++)
+    moveUp(state);
+  return 0;
+}
+
 int escape(t_state * state)
 {
   if(state->selected[1] != -1)

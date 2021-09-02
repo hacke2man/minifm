@@ -27,6 +27,8 @@ int visualMoveUp(t_state * state);
 int changeSelectionPos(t_state * state);
 int printSelected(t_state * state);
 int selectOne(t_state * state);
+int halfPageUp(t_state * state);
+int halfPageDown(t_state * state);
 
 #ifdef __cplusplus
 }

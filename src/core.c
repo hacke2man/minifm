@@ -8,6 +8,7 @@
 //draws to terminal
 //TODO: add option to show git info
 //TODO: refactor
+//TODO: add colums for line numbers based on dirCount
 //FIXME: line numbers in selection mode are wrong
 void draw(t_state * state)
 {
@@ -100,6 +101,8 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
   listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
+  listQueue(commands, initAction(NORMAL, "D", halfPageDown));
+  listQueue(commands, initAction(NORMAL, "U", halfPageUp));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
   listQueue(commands, initAction(VISUAL, "j", visualMoveDown));
@@ -118,6 +121,7 @@ void printAfter(t_state * state, char * msg)
     fprintf(state->tty, "\r\033[J\033[%dA", getEnd(state) + 1);
 }
 
+//TODO: add modmasks
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};

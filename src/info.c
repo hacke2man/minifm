@@ -69,7 +69,6 @@ void updateDirList(t_state * state)
 }
 
 //determin how many remaining files can be drawn
-//TODO: allow for custom view range
 int getEnd(t_state * state)
 {
   if (*state->dirCount < state->viewRange ||
@@ -83,7 +82,6 @@ int getEnd(t_state * state)
 }
 
 //determin how many previous files can be drawn
-//TODO: allow for custom view range
 int getStart(t_state * state)
 {
   if (*state->selected > state->viewRange/2)
