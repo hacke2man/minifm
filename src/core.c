@@ -112,10 +112,10 @@ struct actionNode * initDefaultMappings()
 
 void printAfter(t_state * state, char * msg)
 {
-    for(int i = 0; i < *state->dirCount; i++)
+    for(int i = 0; i < getEnd(*state->selected, *state->dirCount); i++)
       fprintf(state->tty, "\n");
     fprintf(state->tty, "%s\n", msg);
-    fprintf(state->tty, "\r\033[J\033[%dA", *state->dirCount + 1);
+    fprintf(state->tty, "\r\033[J\033[%dA", getEnd(*state->selected, *state->dirCount) + 1);
 }
 
 int input(t_state * state, struct actionNode * commands)
@@ -133,7 +133,7 @@ int input(t_state * state, struct actionNode * commands)
   while(1)
   {
     tmp[0] = getchar();
-    if(tmp[0] == 27 && (strlen(combo) > 1 || strlen(countStr) > 1)) return 0;
+    if(tmp[0] == 27 && (strlen(combo) > 1 || strlen(countStr))) return 0;
 
     if(containsNonNum)
     {
