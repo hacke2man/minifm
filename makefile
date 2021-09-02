@@ -17,4 +17,4 @@ clean:
 	rm build/* a.out
 
 install: all
-	cp a.out /usr/local/bin/mfm
+	cp a.out /usr/local/bin/minifm
