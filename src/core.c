@@ -8,7 +8,7 @@
 
 //draws to terminal
 //TODO: add option to show git info
-//TODO: refactor
+//TODO: refactor, make support for messages easier
 //TODO: add colums for line numbers based on dirCount
 void draw(t_state * state)
 {
