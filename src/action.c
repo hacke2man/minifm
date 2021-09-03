@@ -297,9 +297,7 @@ int removeFile(t_state * state)
 
 int yank(t_state * state)
 {
-  char yankListPath[PATH_MAX];
-  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
-  FILE * yankList = fopen(yankListPath, "w");
+  FILE * yankList = fopen("/tmp/yanklist", "w");
 
   int i = state->mode != VISUAL && state->selected[1] != -1 ? 1 : 0;
   for(; state->selected[i] != -1; i++)
@@ -307,11 +305,10 @@ int yank(t_state * state)
   return 1;
 }
 
+//TODO: error checking
 int put(t_state * state)
 {
-  char yankListPath[PATH_MAX];
-  sprintf(yankListPath, "%s/mfm/yanklist", getenv("XDG_DATA_HOME"));
-  FILE * yankList = fopen(yankListPath, "r");
+  FILE * yankList = fopen("/tmp/yanklist", "r");
   char putFile[PATH_MAX];
   char command[2*PATH_MAX + 1];
   char * newline;

@@ -7,9 +7,11 @@
 #include "info.h"
 
 //draws to terminal
-//TODO: add option to show git info
 //TODO: refactor, make support for messages easier
-//TODO: add colums for line numbers based on dirCount
+//TODO: add max name langth
+//TODO: themes
+//TODO: colour pipes, and files with execute privilage different
+//TODO: add option to show git info
 void draw(t_state * state)
 {
   char ** bufferArray = state->bufferArray;
