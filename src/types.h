@@ -7,26 +7,44 @@ extern "C" {
 #include <stdio.h>
 #include <termios.h>
 
+#define true 1
+#define false 0
+
 typedef enum{
   NORMAL = 1,
   INSERT = 2,
   VISUAL = 4,
 } mode;
 
+//TODO: add config struct
 typedef struct state{
+  //data
   mode mode;
   int * dirCount;
   int * selected;
-  char ** bufferArray;
-  char ** deletedFiles;
+  char * msg;
   char * cwd;
+  char ** bufferArray;
   FILE * tty;
   int topOfSelection;
-  int viewHidden;
-  int viewRange;
   struct termios oldt;
   struct termios newt;
+  //config
+  int viewHidden;
+  int viewRange;
 } t_state;
+
+typedef struct termLine {
+  int invertText;
+  int textColourBg;
+  int textColourFg;
+  char * text;
+  int invertNum;
+  int numFg;
+  int numBg;
+  int lineNum;
+  int numPadding;
+} t_termLine;
 
 typedef struct {
   mode mode;

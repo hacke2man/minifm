@@ -8,6 +8,8 @@
 #include "info.h"
 #include "core.h"
 
+//TODO: convert bool nums to use true and false vars
+
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   t_state * state = malloc(sizeof(t_state));
@@ -24,6 +26,8 @@ int main(int argc, char * argv[]) {
   state->mode = NORMAL;
   state->topOfSelection = 1;
   state->viewRange = 12;
+  state->msg = malloc(sizeof(char) * PATH_MAX);
+  state->msg[0] = '\0';
 
   for(int i = 1; i < dirCount + 1; i++)
   {
@@ -52,6 +56,7 @@ int main(int argc, char * argv[]) {
   tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
   fprintf(state->tty, "\e[?25h");
 
+  free(state->msg);
   free(state->selected);
    
   exit(0);
