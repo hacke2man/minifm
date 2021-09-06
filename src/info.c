@@ -4,21 +4,22 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "info.h"
+#include <git2.h>
 
 //callback for comparing file names
 int compFunc(const void * a, const void * b)
 {
-  char ** aval = (char **) a;
+  t_fileAttrib * aval = (t_fileAttrib *) a;
   int ascore = 0;
-  if(isDir(*aval))
+  if(isDir(aval->name))
     ascore -= 10 ;
 
-  char ** bval = (char **) b;
+  t_fileAttrib * bval = (t_fileAttrib *) b;
   int bscore = 0;
-  if(isDir(*bval))
+  if(isDir(bval->name))
     bscore -= 10;
 
-  if(strcmp(*aval, *bval) >= 0)
+  if(strcmp(aval->name, bval->name) >= 0)
     ascore++;
   else
     bscore++;
@@ -33,7 +34,7 @@ int compFunc(const void * a, const void * b)
 void updateDirList(t_state * state)
 {
   int viewHidden = state->viewHidden;
-  char ** bufferArray = state->bufferArray;
+  t_fileAttrib ** fileAttribArray = state->fileAttribArray;
 
   int dircount = countDir(state);
   DIR * dir;
@@ -57,15 +58,17 @@ void updateDirList(t_state * state)
 
     if(ent->d_name[0] != '.' || viewHidden)
     {
-      bufferArray[ind] = malloc(sizeof(ent->d_name));
-      memset(bufferArray[ind], '\0', sizeof(ent->d_name));
-      strcpy(bufferArray[ind], ent->d_name);
+      free(fileAttribArray[ind]);
+      fileAttribArray[ind] = malloc(sizeof(t_fileAttrib));
+      fileAttribArray[ind]->name = malloc(sizeof(ent->d_name));
+      memset(fileAttribArray[ind]->name, '\0', sizeof(ent->d_name));
+      strcpy(fileAttribArray[ind]->name, ent->d_name);
       ind++;
     }
     ent = readdir(dir);
   }
   closedir(dir);
-  qsort(bufferArray, dircount, sizeof(char *), compFunc);
+  qsort(fileAttribArray, dircount, sizeof(char *), compFunc);
 }
 
 //determin how many remaining files can be drawn

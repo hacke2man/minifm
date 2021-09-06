@@ -17,10 +17,11 @@ int main(int argc, char * argv[]) {
   char cwd[PATH_MAX];
   int dirCount;
 
+  dirCount = countDir(state);
   state->viewHidden = 0;
   state->dirCount = &dirCount;
   state->tty = fopen("/dev/tty", "w");
-  state->bufferArray = malloc(sizeof(char *) * 10000);
+  state->fileAttribArray = malloc(sizeof(t_fileAttrib) * 10000);
   state->cwd = cwd;
   state->selected = malloc(sizeof(int) * dirCount + 1);
   state->mode = NORMAL;
@@ -35,8 +36,8 @@ int main(int argc, char * argv[]) {
   }
   state->selected[0] = 0;
 
+
   getcwd(cwd, sizeof(cwd));
-  dirCount = countDir(state);
   tcgetattr( STDIN_FILENO, &state->oldt);
   cfmakeraw(&state->newt);
   tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);

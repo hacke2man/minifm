@@ -63,7 +63,6 @@ int isSelected(t_state * state, int lineNum)
 }
 
 //draws to terminal
-//TODO: refactor, make support for messages easier
 //TODO: add max name langth
 //TODO: themes
 //TODO: colour pipes, and files with execute privilage different
@@ -88,11 +87,11 @@ void draw(t_state * state)
       line->invertNum = 1;
     }
 
-    if(isDir(state->bufferArray[i]))
+    if(isDir(state->fileAttribArray[i]->name))
       line->textColourFg = 34;
 
     line->invertText = isSelected(state, i);
-    line->text = state->bufferArray[i];
+    line->text = state->fileAttribArray[i]->name;
     printLine(state, line);
   }
   fprintf(state->tty, "%s\n\r", state->msg);

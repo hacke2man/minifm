@@ -137,7 +137,7 @@ int selectOne(t_state * state)
 //COULD: make into a mode
 int Search(t_state * state)
 {
-  char ** bufferArray = state->bufferArray;
+  t_fileAttrib ** fileAtrribArray = state->fileAttribArray;
   int * selected = state->selected;
   int * dirCount = state->dirCount;
   char * cwd = state->cwd;
@@ -163,11 +163,11 @@ int Search(t_state * state)
     strcat(search, tmp);
     for(int i = 0; i < *dirCount; i++)
     {
-      for(int j = 0; j < strlen(bufferArray[i]); j++)
+      for(int j = 0; j < strlen(fileAtrribArray[i]->name); j++)
       {
-        if(bufferArray[i][j] == search[0])
+        if(fileAtrribArray[i]->name[j] == search[0])
         {
-          currentScore = matchScore(&search[j], &bufferArray[i][j]);
+          currentScore = matchScore(&search[j], &fileAtrribArray[i]->name[j]);
 
           if (currentScore > bestScore)
           {
@@ -188,18 +188,18 @@ int Search(t_state * state)
 //output name of selected file and exit program
 int enter(t_state * state)
 {
-  char ** bufferArray = state->bufferArray;
+  t_fileAttrib ** fileAttribArray = state->fileAttribArray;
   int * selected = state->selected;
   int * dirCount = state->dirCount;
   char * cwd = state->cwd;
   FILE * tty = state->tty;
 
-  char * sel = malloc(sizeof(char) * (strlen(bufferArray[*selected]) + 1));
-  strcpy(sel, bufferArray[*selected]);
+  char * sel = malloc(sizeof(char) * (strlen(fileAttribArray[*selected]->name) + 1));
+  strcpy(sel, fileAttribArray[*selected]->name);
   *selected = 0;
 
   for(int i = 0; i < *dirCount; i++)
-    free(bufferArray[i]);
+    freeFileAttrib(fileAttribArray[i]);
 
   fprintf(tty, "\033[J");
   strcat(cwd, "/");
@@ -274,11 +274,11 @@ int gotoBottom(t_state * state){
 
 int backDir(t_state * state)
 {
-  char ** bufferArray = state->bufferArray;
+  t_fileAttrib ** fileAttribArray = state->fileAttribArray;
   int * dirCount = state->dirCount;
   FILE * tty = state->tty;
   for(int i = 0; i < *dirCount; i++)
-    free(bufferArray[i]);
+    freeFileAttrib(fileAttribArray[i]);
 
   fprintf(tty, "\033[J");
   tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
@@ -290,7 +290,7 @@ int backDir(t_state * state)
 int removeFile(t_state * state)
 {
   for(int i = 0; state->selected[i] != -1; i++)
-    remove(state->bufferArray[state->selected[i]]);
+    remove(state->fileAttribArray[state->selected[i]]->name);
   updateDirList(state);
   return 1;
 }
@@ -301,7 +301,7 @@ int yank(t_state * state)
 
   int i = state->mode != VISUAL && state->selected[1] != -1 ? 1 : 0;
   for(; state->selected[i] != -1; i++)
-    fprintf(yankList, "%s/%s\n", state->cwd, state->bufferArray[state->selected[i]]);
+    fprintf(yankList, "%s/%s\n", state->cwd, state->fileAttribArray[state->selected[i]]->name);
   return 1;
 }
 

@@ -16,6 +16,13 @@ typedef enum{
   VISUAL = 4,
 } mode;
 
+typedef struct s_fileAttrib {
+  char * name;
+  unsigned int gitStatus;
+  unsigned int lastModified;
+  unsigned int permissions;
+} t_fileAttrib;
+
 //TODO: add config struct
 typedef struct state{
   //data
@@ -24,7 +31,7 @@ typedef struct state{
   int * selected;
   char * msg;
   char * cwd;
-  char ** bufferArray;
+  t_fileAttrib ** fileAttribArray;
   FILE * tty;
   int topOfSelection;
   struct termios oldt;
@@ -57,6 +64,8 @@ struct actionNode {
   struct actionNode * nextNode;
   struct actionNode * tail;
 };
+
+void freeFileAttrib(t_fileAttrib * fileAttrib);
 
 #ifdef __cplusplus
 }
