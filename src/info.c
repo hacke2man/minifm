@@ -9,17 +9,17 @@
 //callback for comparing file names
 int compFunc(const void * a, const void * b)
 {
-  t_fileAttrib * aval = (t_fileAttrib *) a;
+  t_fileAttrib ** aval = (t_fileAttrib **) a;
   int ascore = 0;
-  if(isDir(aval->name))
+  if(isDir((*aval)->name))
     ascore -= 10 ;
 
-  t_fileAttrib * bval = (t_fileAttrib *) b;
+  t_fileAttrib ** bval = (t_fileAttrib **) b;
   int bscore = 0;
-  if(isDir(bval->name))
+  if(isDir((*bval)->name))
     bscore -= 10;
 
-  if(strcmp(aval->name, bval->name) >= 0)
+  if(strcmp((*aval)->name, (*bval)->name) >= 0)
     ascore++;
   else
     bscore++;
