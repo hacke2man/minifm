@@ -142,8 +142,8 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
   listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
   listQueue(commands, initAction(NORMAL, "p", put));
-  listQueue(commands, initAction(NORMAL, "D", halfPageDown));
-  listQueue(commands, initAction(NORMAL, "U", halfPageUp));
+  listQueue(commands, initAction(NORMAL, "\4", halfPageDown)); //ctrl-D
+  listQueue(commands, initAction(NORMAL, "\x15", halfPageUp)); //ctrl-U
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
   listQueue(commands, initAction(VISUAL, "j", visualMoveDown));
@@ -154,7 +154,6 @@ struct actionNode * initDefaultMappings()
   return commands;
 }
 
-//TODO: add modmasks
 int input(t_state * state, struct actionNode * commands)
 {
   char tmp[2] = {' ', '\0'};

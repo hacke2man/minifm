@@ -58,6 +58,7 @@ int main(int argc, char * argv[]) {
 
   free(state->msg);
   free(state->selected);
+  free(state);
    
   exit(0);
 }
