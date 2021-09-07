@@ -2,8 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <unistd.h>
 #include <termios.h>
+#include <git2.h>
+#include <unistd.h>
 
 #include "info.h"
 #include "core.h"
@@ -12,13 +13,15 @@
 
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
+  git_libgit2_init();
+
   t_state * state = malloc(sizeof(t_state));
   int c;
   char cwd[PATH_MAX];
   int dirCount;
 
-  dirCount = countDir(state);
   state->viewHidden = 0;
+  dirCount = countDir(state);
   state->dirCount = &dirCount;
   state->tty = fopen("/dev/tty", "w");
   state->fileAttribArray = malloc(sizeof(t_fileAttrib) * 10000);
@@ -35,7 +38,6 @@ int main(int argc, char * argv[]) {
     state->selected[i] = -1;
   }
   state->selected[0] = 0;
-
 
   getcwd(cwd, sizeof(cwd));
   tcgetattr( STDIN_FILENO, &state->oldt);
@@ -61,5 +63,5 @@ int main(int argc, char * argv[]) {
   free(state->selected);
   free(state);
    
-  exit(0);
+  git_libgit2_shutdown();
 }

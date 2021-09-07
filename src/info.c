@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "info.h"
 #include <git2.h>
+#include <signal.h>
 
 //callback for comparing file names
 int compFunc(const void * a, const void * b)
@@ -77,11 +78,12 @@ int getEnd(t_state * state)
   if (*state->dirCount < state->viewRange ||
   *state->selected + state->viewRange/2 > *state->dirCount)
     return *state->dirCount;
-  else
-    return *state->selected < state->viewRange/2 ?
-    state->viewRange
-    :
-    *state->selected + state->viewRange/2;
+  else if(*state->selected < state->viewRange/2)
+  {
+    return state->viewRange;
+  } else {
+    return *state->selected + state->viewRange/2;
+  }
 }
 
 //determin how many previous files can be drawn
@@ -118,8 +120,7 @@ int countDir(t_state * state)
   int dirCount = 0;
   while ((ent = readdir(dir))) {
     if(ent->d_name[0] != '.' || viewHidden)
-    // if(ent->d_name[0] != '.' || viewHidden)
-    dirCount++;
+      dirCount++;
   }
   closedir(dir);
   return dirCount;

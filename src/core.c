@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -71,7 +72,6 @@ void draw(t_state * state)
 {
   t_termLine * line = malloc(sizeof(t_termLine));
   line->numPadding = (int)ceil(log10((double)*state->dirCount + 1));
-
   fprintf(state->tty, "\033[J");
 
   for(int i = getStart(state);
