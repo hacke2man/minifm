@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <termios.h>
-#include <git2.h>
 #include <unistd.h>
 
 #include "info.h"
@@ -13,8 +12,6 @@
 
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
-  git_libgit2_init();
-
   t_state * state = malloc(sizeof(t_state));
   int c;
   char cwd[PATH_MAX];
@@ -62,6 +59,4 @@ int main(int argc, char * argv[]) {
   free(state->msg);
   free(state->selected);
   free(state);
-   
-  git_libgit2_shutdown();
 }
