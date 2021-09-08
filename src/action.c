@@ -14,9 +14,9 @@ int toggleHidden(t_state * state)
   float newsel = (float)*state->selected / (float)*state->dirCount;
   state->viewHidden = !state->viewHidden;
   *state->dirCount = countDir(state);
-  state->selected = malloc(sizeof(int) * *state->dirCount + 1);
 
   free(state->selected);
+  state->selected = malloc(sizeof(int) * *state->dirCount + 1);
   for(int i = 1; i < *state->dirCount + 1; i++)
   {
     state->selected[i] = -1;
