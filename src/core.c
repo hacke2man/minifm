@@ -35,6 +35,7 @@ char * PrintStatus(char * statusString, unsigned int status)
   return statusString;
 }
 
+//TODO: add name padding
 void printLine(t_state * state, t_termLine * line)
 {
   int invertNum = line->invertNum ? 7 : 0;
@@ -44,7 +45,7 @@ void printLine(t_state * state, t_termLine * line)
   statusString[0] = '\0';
 
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m%s%d\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m %s\n\r",
   invertNum,
   line->numFg,
   line->numBg,
@@ -54,8 +55,7 @@ void printLine(t_state * state, t_termLine * line)
   line->textColourFg,
   line->textColourBg,
   line->text,
-  PrintStatus(statusString, line->gitStatus),
-  line->gitStatus);
+  PrintStatus(statusString, line->gitStatus));
 
   free(statusString);
 }
