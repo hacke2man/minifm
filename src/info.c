@@ -30,12 +30,27 @@ int compFunc(const void * a, const void * b)
 
 void SetFileGitStatus(t_state * state, const char * fileName, unsigned int status)
 {
+  char * tmp = strchr(fileName, '/');
+  int inDir = false;
+  if(*tmp == '/')
+  {
+    inDir = true;
+    *tmp = '\0';
+  }
+
   int i = 0;
-  size_t count = git_status_list_entrycount(state->gitState->statuses);
-  for(; i < count && strcmp(fileName, state->fileAttribArray[i]->name) != 0; i++);
-  state->fileAttribArray[i]->gitStatus = status;
+  for(; i < *state->dirCount; i++)
+  {
+    if(strcmp(fileName, state->fileAttribArray[i]->name) == 0)
+      state->fileAttribArray[i]->gitStatus = status | state->fileAttribArray[i]->gitStatus;
+  }
+
+  if(inDir)
+    *tmp = '/';
 }
 
+//FIXME: make this work deep in git repo
+//FIXME: modify dir status, by its files
 void SetGitStatus(t_state * state)
 {
   const git_status_entry * entry;

@@ -25,6 +25,7 @@ int main(int argc, char * argv[]) {
 
   state->gitState->repo = NULL;
   int error = git_repository_open(&state->gitState->repo, ".");
+  //FIXME: prevent this from crashing program if false
   if(error != 0)
   {
     printf("no repo\n");

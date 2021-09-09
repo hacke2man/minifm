@@ -24,12 +24,27 @@ int isCursorLine(t_state * state, int line)
   return 0;
 }
 
+enum statusFlags {
+  WT_MODIFIED = 1 << 8,
+};
+
+char * PrintStatus(char * statusString, unsigned int status)
+{
+  if((status & WT_MODIFIED) > 0)
+    strcat(statusString, "M");
+  return statusString;
+}
+
 void printLine(t_state * state, t_termLine * line)
 {
   int invertNum = line->invertNum ? 7 : 0;
   int invertText = line->invertText ? 7 : 0;
+  char * statusString;
+  statusString = malloc(sizeof(char) * 255);
+  statusString[0] = '\0';
+
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m%d\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m%s%d\n\r",
   invertNum,
   line->numFg,
   line->numBg,
@@ -39,7 +54,10 @@ void printLine(t_state * state, t_termLine * line)
   line->textColourFg,
   line->textColourBg,
   line->text,
+  PrintStatus(statusString, line->gitStatus),
   line->gitStatus);
+
+  free(statusString);
 }
 
 void setDefaultLine(t_termLine * line)
