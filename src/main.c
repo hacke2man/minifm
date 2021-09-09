@@ -28,31 +28,18 @@ int main(int argc, char * argv[]) {
   //FIXME: prevent this from crashing program if false
   if(error != 0)
   {
-    printf("no repo\n");
-    getchar();
+    /* printf("no repo\n");
+    getchar(); */
+    state->gitState->repoRoot = NULL;
+  } else {
+    state->gitState->repoRoot = "not NULL";
   }
 
   git_status_options opts = GIT_STATUS_OPTIONS_INIT;
-  state->gitState->opts = &opts;
-
-  state->gitState->statuses = NULL;
-  error = git_status_list_new(&state->gitState->statuses, state->gitState->repo, &opts);
-  if(error != 0)
+  if(state->gitState->repoRoot)
   {
-    printf("no status list\n");
-    getchar();
+    state->gitState->opts = &opts;
   }
-
-  /* git_index *index = NULL;
-  error = git_repository_index(&index, repo);
-  if(error != 0)
-  {
-    printf("welp");
-    getchar();
-  } */
-
-  /* error = git_index_open(&index, ".");
-  state->gitState->index = index; */
 
   state->viewHidden = 0;
   dirCount = countDir(state);

@@ -28,6 +28,11 @@ int compFunc(const void * a, const void * b)
   return ascore - bscore;
 }
 
+/* int PathMatch(t_state * state, char * fileName, char * repoPath)
+{
+
+} */
+
 void SetFileGitStatus(t_state * state, const char * fileName, unsigned int status)
 {
   char * tmp = strchr(fileName, '/');
@@ -107,16 +112,17 @@ void updateDirList(t_state * state)
   closedir(dir);
   qsort(fileAttribArray, dircount, sizeof(char *), compFunc);
 
-  git_status_options opts = GIT_STATUS_OPTIONS_INIT;
-  state->gitState->opts = &opts;
-  state->gitState->statuses = NULL;
-  int error = git_status_list_new(&state->gitState->statuses, state->gitState->repo, &opts);
-  if(error != 0)
+  if(state->gitState->repoRoot)
   {
-    printf("no status list\n");
-    getchar();
+    state->gitState->statuses = NULL;
+    int error = git_status_list_new(&state->gitState->statuses, state->gitState->repo, state->gitState->opts);
+    if(error != 0)
+    {
+      printf("no status list\n");
+      getchar();
+    }
+    SetGitStatus(state);
   }
-  SetGitStatus(state);
 }
 
 //determin how many remaining files can be drawn
