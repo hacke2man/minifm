@@ -25,13 +25,31 @@ int isCursorLine(t_state * state, int line)
 }
 
 enum statusFlags {
+  IX_MODIFIED = 1,
+  IX_MODIFIED_B = 1 << 1,
   WT_MODIFIED = 1 << 8,
 };
 
 char * PrintStatus(char * statusString, unsigned int status)
 {
+  char wtChar = ' ';
+  char ixChar = ' ';
+
   if((status & WT_MODIFIED) > 0)
-    strcat(statusString, "M");
+    wtChar = 'M';
+
+  if((status & IX_MODIFIED) > 0)
+    ixChar = 'M';
+
+  //HACK: idk why this is how it is
+  if((status & IX_MODIFIED_B) > 0)
+    ixChar = 'M';
+
+  char tmp[256];
+  tmp[0] = '\0';
+
+  sprintf(tmp, "\e[31m%c\e[32m%c", wtChar, ixChar);
+  strcat(statusString, tmp);
   return statusString;
 }
 
@@ -45,7 +63,7 @@ void printLine(t_state * state, t_termLine * line)
   statusString[0] = '\0';
 
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m %s\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m %s\e[0m\n\r",
   invertNum,
   line->numFg,
   line->numBg,

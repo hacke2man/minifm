@@ -32,14 +32,13 @@ void SetFileGitStatus(t_state * state, const char * fileName, unsigned int statu
 {
   char * tmp = strchr(fileName, '/');
   int inDir = false;
-  if(*tmp == '/')
+  if(tmp)
   {
     inDir = true;
     *tmp = '\0';
   }
 
-  int i = 0;
-  for(; i < *state->dirCount; i++)
+  for(int i = 0; i < *state->dirCount; i++)
   {
     if(strcmp(fileName, state->fileAttribArray[i]->name) == 0)
       state->fileAttribArray[i]->gitStatus = status | state->fileAttribArray[i]->gitStatus;
@@ -57,7 +56,10 @@ void SetGitStatus(t_state * state)
 
   for (size_t i=0; i<count; ++i) {
     entry = git_status_byindex(state->gitState->statuses, i);
-    SetFileGitStatus(state, entry->index_to_workdir->new_file.path, entry->status);
+    if(entry->head_to_index)
+      SetFileGitStatus(state, entry->head_to_index->new_file.path, entry->status);
+    else
+      SetFileGitStatus(state, entry->index_to_workdir->new_file.path, entry->status);
   }
 }
 
