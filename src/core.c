@@ -29,7 +29,7 @@ void printLine(t_state * state, t_termLine * line)
   int invertNum = line->invertNum ? 7 : 0;
   int invertText = line->invertText ? 7 : 0;
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m%d\n\r",
   invertNum,
   line->numFg,
   line->numBg,
@@ -38,7 +38,8 @@ void printLine(t_state * state, t_termLine * line)
   invertText,
   line->textColourFg,
   line->textColourBg,
-  line->text);
+  line->text,
+  line->gitStatus);
 }
 
 void setDefaultLine(t_termLine * line)
@@ -92,6 +93,7 @@ void draw(t_state * state)
 
     line->invertText = isSelected(state, i);
     line->text = state->fileAttribArray[i]->name;
+    line->gitStatus = state->fileAttribArray[i]->gitStatus;
     printLine(state, line);
   }
   fprintf(state->tty, "%s\n\r", state->msg);

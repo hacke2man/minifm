@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include <termios.h>
+#include <git2.h>
 
 #define true 1
 #define false 0
@@ -23,9 +24,17 @@ typedef struct s_fileAttrib {
   unsigned int permissions;
 } t_fileAttrib;
 
+typedef struct gitState {
+  git_repository * repo;
+  git_index * index;
+  git_status_options * opts;
+  git_status_list * statuses;
+} t_gitState;
+
 //TODO: add config struct
 typedef struct state{
   //data
+  t_gitState * gitState;
   mode mode;
   int * dirCount;
   int * selected;
@@ -51,6 +60,7 @@ typedef struct termLine {
   int numBg;
   int lineNum;
   int numPadding;
+  int gitStatus;
 } t_termLine;
 
 typedef struct {
