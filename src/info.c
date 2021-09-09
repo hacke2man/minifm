@@ -50,7 +50,6 @@ void SetFileGitStatus(t_state * state, const char * fileName, unsigned int statu
 }
 
 //FIXME: make this work deep in git repo
-//FIXME: modify dir status, by its files
 void SetGitStatus(t_state * state)
 {
   const git_status_entry * entry;
