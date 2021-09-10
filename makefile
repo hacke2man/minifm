@@ -17,5 +17,4 @@ clean:
 	rm build/* a.out
 
 install: all
-	[ -d /home/${SUDO_USER}/.local/share/mfm ] || mkdir "/home/${SUDO_USER}/.local/share/mfm"
 	cp a.out /usr/local/bin/minifm

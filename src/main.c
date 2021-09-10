@@ -20,27 +20,6 @@ int main(int argc, char * argv[]) {
   char cwd[PATH_MAX];
   int dirCount;
 
-  //git
-  state->gitState = malloc(sizeof(t_gitState));
-
-  state->gitState->repo = NULL;
-  int error = git_repository_open(&state->gitState->repo, ".");
-  //FIXME: prevent this from crashing program if false
-  if(error != 0)
-  {
-    /* printf("no repo\n");
-    getchar(); */
-    state->gitState->repoRoot = NULL;
-  } else {
-    state->gitState->repoRoot = "not NULL";
-  }
-
-  git_status_options opts = GIT_STATUS_OPTIONS_INIT;
-  if(state->gitState->repoRoot)
-  {
-    state->gitState->opts = &opts;
-  }
-
   state->viewHidden = 0;
   dirCount = countDir(state);
   state->dirCount = &dirCount;
@@ -65,10 +44,28 @@ int main(int argc, char * argv[]) {
   cfmakeraw(&state->newt);
   tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);
   fprintf(state->tty, "\e[?25l");
-  updateDirList(state);
 
   struct actionNode * commands = initDefaultMappings();
 
+  //git
+  state->gitState = malloc(sizeof(t_gitState));
+
+  state->gitState->repo = NULL;
+  int error = git_repository_open(&state->gitState->repo, ".");
+  if(error != 0 || strcmp(state->cwd, getenv("HOME")) == 0)
+  {
+    state->gitState->repoRoot = NULL;
+  } else {
+    state->gitState->repoRoot = "not NULL";
+  }
+
+  git_status_options opts = GIT_STATUS_OPTIONS_INIT;
+  if(state->gitState->repoRoot)
+  {
+    state->gitState->opts = &opts;
+  }
+
+  updateDirList(state);
   //program loop
   int done = 0;
   while(!done){
