@@ -31,10 +31,10 @@ int compFunc(const void * a, const void * b)
 int MatchChildOrParent(t_state * state, char * fileName, const char * gitFileName)
 {
   char tmpFilePath[PATH_MAX];
-  sprintf(tmpFilePath, "%s/%s", state->gitState->cwdRootDiff, fileName);
+  sprintf(tmpFilePath, "%s%s", state->gitState->cwdRootDiff, fileName);
 
   int matches = 1;
-  for(int i = 0; i < strlen(fileName); i++)
+  for(int i = 0; i < strlen(tmpFilePath); i++)
   {
     if(tmpFilePath[i] != gitFileName[i])
     {

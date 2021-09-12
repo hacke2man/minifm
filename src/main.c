@@ -71,7 +71,13 @@ int main(int argc, char * argv[]) {
   {
     state->gitState->opts = &opts;
     char * cwdRootDiff = malloc(sizeof(char) * PATH_MAX);
-    strcpy(cwdRootDiff, &state->cwd[strlen(state->gitState->repoRoot) + 1]);
+
+    cwdRootDiff[0] = '\0';
+    if(strlen(state->cwd) != strlen(state->gitState->repoRoot))
+      strcpy(cwdRootDiff, &state->cwd[strlen(state->gitState->repoRoot) + 1]);
+    if(strlen(cwdRootDiff) > 0)
+      strcat(cwdRootDiff, "/");
+
     state->gitState->cwdRootDiff = cwdRootDiff;
   }
 
