@@ -52,7 +52,6 @@ int main(int argc, char * argv[]) {
   //#########
   //## git ##
   //#########
-  //FIXME: make this work deep in git repo
   state->gitState = malloc(sizeof(t_gitState));
 
   state->gitState->repo = NULL;
