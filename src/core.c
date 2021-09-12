@@ -6,6 +6,34 @@
 #include "action.h"
 #include "actionPlumbing.h"
 #include "info.h"
+#include <git2.h>
+#include <limits.h>
+
+char * GetRepoRoot()
+{
+  char * cwd = malloc(sizeof(char) * PATH_MAX);
+  char * tmpPath = malloc(sizeof(char) * PATH_MAX);
+  cwd = getenv("PWD");
+  int error = 1;
+
+  while(error)
+  {
+    sprintf(tmpPath, "%s/.git", cwd);
+    if( access( tmpPath, F_OK ) == 0 ) {
+      error = 0;
+    } else {
+      error = 1;
+    }
+
+    if(error)
+    *strrchr(cwd, '/') = '\0';
+  }
+
+  if(strcmp(getenv("HOME"), cwd) == 0)
+    cwd[0] = '\0';
+
+  return cwd;
+}
 
 int isCursorLine(t_state * state, int line)
 {
@@ -24,12 +52,46 @@ int isCursorLine(t_state * state, int line)
   return 0;
 }
 
+enum statusFlags {
+  IX_MODIFIED = 1,
+  IX_MODIFIED_B = 1 << 1,
+  WT_MODIFIED = 1 << 8,
+};
+
+char * PrintStatus(char * statusString, unsigned int status)
+{
+  char wtChar = ' ';
+  char ixChar = ' ';
+
+  if((status & WT_MODIFIED) > 0)
+    wtChar = 'M';
+
+  if((status & IX_MODIFIED) > 0)
+    ixChar = 'M';
+
+  //HACK: idk why this is how it is
+  if((status & IX_MODIFIED_B) > 0)
+    ixChar = 'M';
+
+  char tmp[256];
+  tmp[0] = '\0';
+
+  sprintf(tmp, "\e[31m%c\e[32m%c", wtChar, ixChar);
+  strcat(statusString, tmp);
+  return statusString;
+}
+
+//TODO: add name padding
 void printLine(t_state * state, t_termLine * line)
 {
   int invertNum = line->invertNum ? 7 : 0;
   int invertText = line->invertText ? 7 : 0;
+  char * statusString;
+  statusString = malloc(sizeof(char) * 255);
+  statusString[0] = '\0';
+
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m %s\e[0m\n\r",
   invertNum,
   line->numFg,
   line->numBg,
@@ -38,7 +100,10 @@ void printLine(t_state * state, t_termLine * line)
   invertText,
   line->textColourFg,
   line->textColourBg,
-  line->text);
+  line->text,
+  PrintStatus(statusString, line->gitStatus));
+
+  free(statusString);
 }
 
 void setDefaultLine(t_termLine * line)
@@ -92,6 +157,7 @@ void draw(t_state * state)
 
     line->invertText = isSelected(state, i);
     line->text = state->fileAttribArray[i]->name;
+    line->gitStatus = state->fileAttribArray[i]->gitStatus;
     printLine(state, line);
   }
   fprintf(state->tty, "%s\n\r", state->msg);
