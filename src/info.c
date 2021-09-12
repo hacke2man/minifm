@@ -28,32 +28,33 @@ int compFunc(const void * a, const void * b)
   return ascore - bscore;
 }
 
-/* int PathMatch(t_state * state, char * fileName, char * repoPath)
+int MatchChildOrParent(t_state * state, char * fileName, const char * gitFileName)
 {
+  char tmpFilePath[PATH_MAX];
+  sprintf(tmpFilePath, "%s/%s", state->gitState->cwdRootDiff, fileName);
 
-} */
+  int matches = 1;
+  for(int i = 0; i < strlen(fileName); i++)
+  {
+    if(tmpFilePath[i] != gitFileName[i])
+    {
+      matches = 0;
+      break;
+    }
+  }
+
+  return matches;
+}
 
 void SetFileGitStatus(t_state * state, const char * fileName, unsigned int status)
 {
-  char * tmp = strchr(fileName, '/');
-  int inDir = false;
-  if(tmp)
-  {
-    inDir = true;
-    *tmp = '\0';
-  }
-
   for(int i = 0; i < *state->dirCount; i++)
   {
-    if(strcmp(fileName, state->fileAttribArray[i]->name) == 0)
+    if(MatchChildOrParent(state, state->fileAttribArray[i]->name, fileName))
       state->fileAttribArray[i]->gitStatus = status | state->fileAttribArray[i]->gitStatus;
   }
-
-  if(inDir)
-    *tmp = '/';
 }
 
-//FIXME: make this work deep in git repo
 void SetGitStatus(t_state * state)
 {
   const git_status_entry * entry;

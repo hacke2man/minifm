@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include "types.h"
 
+char * GetRepoRoot();
 int enter(t_state * state);
 void draw(t_state * state);
 int input(t_state * state, struct actionNode * commands);

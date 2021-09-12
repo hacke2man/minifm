@@ -26,6 +26,7 @@ typedef struct s_fileAttrib {
 
 typedef struct gitState {
   char * repoRoot;
+  char * cwdRootDiff;
   git_repository * repo;
   git_index * index;
   git_status_options * opts;

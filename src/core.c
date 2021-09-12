@@ -6,6 +6,34 @@
 #include "action.h"
 #include "actionPlumbing.h"
 #include "info.h"
+#include <git2.h>
+#include <limits.h>
+
+char * GetRepoRoot()
+{
+  char * cwd = malloc(sizeof(char) * PATH_MAX);
+  char * tmpPath = malloc(sizeof(char) * PATH_MAX);
+  cwd = getenv("PWD");
+  int error = 1;
+
+  while(error)
+  {
+    sprintf(tmpPath, "%s/.git", cwd);
+    if( access( tmpPath, F_OK ) == 0 ) {
+      error = 0;
+    } else {
+      error = 1;
+    }
+
+    if(error)
+    *strrchr(cwd, '/') = '\0';
+  }
+
+  if(strcmp(getenv("HOME"), cwd) == 0)
+    cwd[0] = '\0';
+
+  return cwd;
+}
 
 int isCursorLine(t_state * state, int line)
 {

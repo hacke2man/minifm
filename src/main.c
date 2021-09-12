@@ -11,6 +11,7 @@
 
 //TODO: convert bool nums to use true and false vars
 
+//FIXME: stop from crashing when opening empty directory
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   git_libgit2_init();
@@ -20,6 +21,7 @@ int main(int argc, char * argv[]) {
   char cwd[PATH_MAX];
   int dirCount;
 
+  //TODO: make init function
   state->viewHidden = 0;
   dirCount = countDir(state);
   state->dirCount = &dirCount;
@@ -47,26 +49,37 @@ int main(int argc, char * argv[]) {
 
   struct actionNode * commands = initDefaultMappings();
 
-  //git
+  //#########
+  //## git ##
+  //#########
+  //FIXME: make this work deep in git repo
   state->gitState = malloc(sizeof(t_gitState));
 
   state->gitState->repo = NULL;
-  int error = git_repository_open(&state->gitState->repo, ".");
-  if(error != 0 || strcmp(state->cwd, getenv("HOME")) == 0)
+  int error;
+
+  state->gitState->repoRoot = GetRepoRoot();
+  error = git_repository_open(&state->gitState->repo, state->gitState->repoRoot);
+
+  if(error != 0 || strcmp(state->gitState->repoRoot, getenv("HOME")) == 0)
   {
     state->gitState->repoRoot = NULL;
-  } else {
-    state->gitState->repoRoot = "not NULL";
   }
 
   git_status_options opts = GIT_STATUS_OPTIONS_INIT;
   if(state->gitState->repoRoot)
   {
     state->gitState->opts = &opts;
+    char * cwdRootDiff = malloc(sizeof(char) * PATH_MAX);
+    strcpy(cwdRootDiff, &state->cwd[strlen(state->gitState->repoRoot) + 1]);
+    state->gitState->cwdRootDiff = cwdRootDiff;
   }
 
   updateDirList(state);
-  //program loop
+
+  //##################
+  //## program loop ##
+  //##################
   int done = 0;
   while(!done){
     draw(state);
