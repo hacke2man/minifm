@@ -11,7 +11,7 @@
 
 //TODO: convert bool nums to use true and false vars
 
-//FIXME: stop from crashing when opening empty directory
+//FIXME: make all actions work while in an empty directory
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   git_libgit2_init();

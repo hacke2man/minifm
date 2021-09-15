@@ -243,7 +243,7 @@ int halfPageUp(t_state * state)
 
 int escape(t_state * state)
 {
-  if(state->selected[1] != -1)
+  if(state->selected[1] != -1 && *state->dirCount > 0)
   {
     for(int i = 1; i < *state->dirCount; i++)
       state->selected[i] = -1;
