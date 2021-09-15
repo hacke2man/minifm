@@ -194,17 +194,19 @@ int enter(t_state * state)
   char * cwd = state->cwd;
   FILE * tty = state->tty;
 
-  char * sel = malloc(sizeof(char) * (strlen(fileAttribArray[*selected]->name) + 1));
-  strcpy(sel, fileAttribArray[*selected]->name);
-  *selected = 0;
+  if(*dirCount > 0)
+  {
+    char * sel = malloc(sizeof(char) * (strlen(fileAttribArray[*selected]->name) + 1));
+    strcpy(sel, fileAttribArray[*selected]->name);
+    *selected = 0;
+    strcat(cwd, "/");
+    strcat(cwd, sel);
+  }
 
   for(int i = 0; i < *dirCount; i++)
     freeFileAttrib(fileAttribArray[i]);
 
   fprintf(tty, "\033[J");
-  strcat(cwd, "/");
-  strcat(cwd, sel);
-
   fprintf(tty, "\e[?25h");
   printf("%s", cwd);
   return 1;

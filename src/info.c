@@ -84,8 +84,6 @@ void updateDirList(t_state * state)
   if(!dir)
     exit(1);
 
-  dircount = countDir(state);
-
   int tmp = *state->selected;
   free(state->selected);
   state->selected = malloc(sizeof(int) * dircount + 1);
