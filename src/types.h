@@ -68,6 +68,7 @@ typedef struct termLine {
   int numBg;
   int lineNum;
   int numPadding;
+  int nameLength;
   int gitStatus;
 } t_termLine;
 

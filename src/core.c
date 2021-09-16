@@ -91,7 +91,7 @@ void printLine(t_state * state, t_termLine * line)
   statusString[0] = '\0';
 
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%s\e[0m %s\e[0m\n\r",
+  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%-*.*s\e[0m %s\e[0m\n\r",
   invertNum,
   line->numFg,
   line->numBg,
@@ -100,6 +100,8 @@ void printLine(t_state * state, t_termLine * line)
   invertText,
   line->textColourFg,
   line->textColourBg,
+  line->nameLength,
+  line->nameLength,
   line->text,
   PrintStatus(statusString, line->gitStatus));
 
@@ -138,6 +140,7 @@ void draw(t_state * state)
   t_termLine * line = malloc(sizeof(t_termLine));
   line->numPadding = (int)ceil(log10((double)*state->dirCount + 1));
   fprintf(state->tty, "\033[J");
+  line->nameLength = state->config->nameLength;
 
   for(int i = getStart(state);
       i < getEnd(state);

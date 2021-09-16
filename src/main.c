@@ -40,6 +40,7 @@ int main(int argc, char * argv[]) {
   state->config->viewRange = 12;
   state->msg = malloc(sizeof(char) * PATH_MAX);
   state->msg[0] = '\0';
+  state->config->nameLength = 15;
 
   for(int i = 1; i < dirCount + 1; i++)
   {
