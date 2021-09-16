@@ -33,6 +33,17 @@ typedef struct gitState {
   git_status_list * statuses;
 } t_gitState;
 
+typedef struct theme {
+  char * normal;
+  char * numberLine;
+  char * gitWarn;
+  char * gitAdd;
+  char * directory;
+  char * link;
+  char * pipe;
+  char * executable;
+} t_theme;
+
 typedef struct config {
   int viewHidden;
   int viewRange;
@@ -56,14 +67,17 @@ typedef struct state{
 
   //config
   t_config * config;
+  t_theme * theme;
 } t_state;
 
 typedef struct termLine {
   int invertText;
+  char * textEscCode;
   int textColourBg;
   int textColourFg;
   char * text;
   int invertNum;
+  char * numEscCode;
   int numFg;
   int numBg;
   int lineNum;
@@ -85,6 +99,7 @@ struct actionNode {
 };
 
 void freeFileAttrib(t_fileAttrib * fileAttrib);
+t_theme * DefaultTheme();
 
 #ifdef __cplusplus
 }

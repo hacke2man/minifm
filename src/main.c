@@ -28,6 +28,8 @@ int main(int argc, char * argv[]) {
 
   //TODO: make init function
   state->config = malloc(sizeof(t_config));
+  state->theme = DefaultTheme();
+
   state->config->viewHidden = 0;
   dirCount = countDir(state);
   state->dirCount = &dirCount;

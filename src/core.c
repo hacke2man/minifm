@@ -90,32 +90,19 @@ void printLine(t_state * state, t_termLine * line)
   statusString[0] = '\0';
 
   fprintf(state->tty,
-  "\e[%d;%d;%dm%*d \e[%d;%d;%dm%-*.*s\e[0m %s\e[0m\n\r",
+  "\e[%dm%s%*d \e[%dm%s%-*.*s\e[0m %s\e[0m\n\r",
   invertNum,
-  line->numFg,
-  line->numBg,
+  line->numEscCode,
   line->numPadding,
   line->lineNum,
   invertText,
-  line->textColourFg,
-  line->textColourBg,
+  line->textEscCode,
   line->nameLength,
   line->nameLength,
   line->text,
   PrintStatus(statusString, line->gitStatus));
 
   free(statusString);
-}
-
-void setDefaultLine(t_termLine * line)
-{
-  line->invertText = 0;
-  line->textColourFg = 39;
-  line->textColourBg = 49;
-  line->text = NULL;
-  line->invertNum = 0;
-  line->numBg = 49;
-  line->numFg = 90;
 }
 
 int isSelected(t_state * state, int lineNum)
@@ -132,19 +119,23 @@ int isSelected(t_state * state, int lineNum)
 //draws to terminal
 //TODO: themes
 //TODO: colour pipes, and files with execute privilage different
-//TODO: add option to show git info
 void draw(t_state * state)
 {
   t_termLine * line = malloc(sizeof(t_termLine));
+  t_theme * theme = state->theme;
   line->numPadding = (int)ceil(log10((double)*state->dirCount + 1));
   fprintf(state->tty, "\033[J");
   line->nameLength = state->config->nameLength;
+  line->numEscCode = theme->numberLine;
 
   for(int i = getStart(state);
       i < getEnd(state);
       i++)
   {
-    setDefaultLine(line);
+    line->invertText = 0;
+    line->invertNum = 0;
+    line->textEscCode = theme->normal;
+
     line->lineNum = *state->selected - i > 0 ? *state->selected - i : (*state->selected - i) * -1;
 
     if(isCursorLine(state, i))
@@ -154,7 +145,7 @@ void draw(t_state * state)
     }
 
     if(isDir(state->fileAttribArray[i]->name))
-      line->textColourFg = 34;
+      line->textEscCode = theme->directory;
 
     line->invertText = isSelected(state, i);
     line->text = state->fileAttribArray[i]->name;
