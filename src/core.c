@@ -81,7 +81,6 @@ char * PrintStatus(char * statusString, unsigned int status)
   return statusString;
 }
 
-//TODO: add name padding
 void printLine(t_state * state, t_termLine * line)
 {
   int invertNum = line->invertNum ? 7 : 0;
@@ -131,7 +130,6 @@ int isSelected(t_state * state, int lineNum)
 }
 
 //draws to terminal
-//TODO: add max name langth
 //TODO: themes
 //TODO: colour pipes, and files with execute privilage different
 //TODO: add option to show git info
