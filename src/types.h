@@ -33,6 +33,12 @@ typedef struct gitState {
   git_status_list * statuses;
 } t_gitState;
 
+typedef struct config {
+  int viewHidden;
+  int viewRange;
+  int nameLength;
+} t_config;
+
 //TODO: add config struct
 typedef struct state{
   //data
@@ -47,9 +53,9 @@ typedef struct state{
   int topOfSelection;
   struct termios oldt;
   struct termios newt;
+
   //config
-  int viewHidden;
-  int viewRange;
+  t_config * config;
 } t_state;
 
 typedef struct termLine {

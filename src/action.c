@@ -17,7 +17,7 @@ int toggleHidden(t_state * state)
   else
     newsel = 0;
 
-  state->viewHidden = !state->viewHidden;
+  state->config->viewHidden = !state->config->viewHidden;
   *state->dirCount = countDir(state);
 
   free(state->selected);
@@ -234,14 +234,14 @@ int moveUp(t_state * state)
 
 int halfPageDown(t_state * state)
 {
-  for(int i = 0; i < state->viewRange/2; i++)
+  for(int i = 0; i < state->config->viewRange/2; i++)
     moveDown(state);
   return 0;
 }
 
 int halfPageUp(t_state * state)
 {
-  for(int i = 0; i < state->viewRange/2; i++)
+  for(int i = 0; i < state->config->viewRange/2; i++)
     moveUp(state);
   return 0;
 }

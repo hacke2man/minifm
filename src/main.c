@@ -27,7 +27,8 @@ int main(int argc, char * argv[]) {
   int dirCount;
 
   //TODO: make init function
-  state->viewHidden = 0;
+  state->config = malloc(sizeof(t_config));
+  state->config->viewHidden = 0;
   dirCount = countDir(state);
   state->dirCount = &dirCount;
   state->tty = fopen("/dev/tty", "w");
@@ -36,7 +37,7 @@ int main(int argc, char * argv[]) {
   state->selected = malloc(sizeof(int) * dirCount + 1);
   state->mode = NORMAL;
   state->topOfSelection = 1;
-  state->viewRange = 12;
+  state->config->viewRange = 12;
   state->msg = malloc(sizeof(char) * PATH_MAX);
   state->msg[0] = '\0';
 
@@ -102,6 +103,7 @@ int main(int argc, char * argv[]) {
 
   git_repository_free(state->gitState->repo);
   free(state->gitState);
+  free(state->config);
   free(state->msg);
   free(state->selected);
   free(state);

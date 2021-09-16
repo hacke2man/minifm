@@ -75,7 +75,7 @@ void SetGitStatus(t_state * state)
 //track of everything on its own
 void updateDirList(t_state * state)
 {
-  int viewHidden = state->viewHidden;
+  int viewHidden = state->config->viewHidden;
   t_fileAttrib ** fileAttribArray = state->fileAttribArray;
 
   int dircount = countDir(state);
@@ -127,28 +127,28 @@ void updateDirList(t_state * state)
 //determin how many remaining files can be drawn
 int getEnd(t_state * state)
 {
-  if (*state->dirCount < state->viewRange ||
-  *state->selected + state->viewRange/2 > *state->dirCount)
+  if (*state->dirCount < state->config->viewRange ||
+  *state->selected + state->config->viewRange/2 > *state->dirCount)
     return *state->dirCount;
-  else if(*state->selected < state->viewRange/2)
+  else if(*state->selected < state->config->viewRange/2)
   {
-    return state->viewRange;
+    return state->config->viewRange;
   } else {
-    return *state->selected + state->viewRange/2;
+    return *state->selected + state->config->viewRange/2;
   }
 }
 
 //determin how many previous files can be drawn
 int getStart(t_state * state)
 {
-  if (*state->selected > state->viewRange/2)
+  if (*state->selected > state->config->viewRange/2)
   {
-    if (*state->dirCount - *state->selected >=  state->viewRange/2)
-      return *state->selected - state->viewRange/2;
-    if(*state->dirCount - state->viewRange < 0)
+    if (*state->dirCount - *state->selected >=  state->config->viewRange/2)
+      return *state->selected - state->config->viewRange/2;
+    if(*state->dirCount - state->config->viewRange < 0)
       return 0;
     else
-      return *state->dirCount - state->viewRange;
+      return *state->dirCount - state->config->viewRange;
   }
   else
     return 0;
@@ -161,7 +161,7 @@ int getStart(t_state * state)
 //count files in dir
 int countDir(t_state * state)
 {
-  int viewHidden = state->viewHidden;
+  int viewHidden = state->config->viewHidden;
   static int count = 0;
   count++;
   DIR * dir;
