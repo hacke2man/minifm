@@ -11,7 +11,12 @@
 
 int toggleHidden(t_state * state)
 {
-  float newsel = (float)*state->selected / (float)*state->dirCount;
+  float newsel;
+  if(*state->selected != 0)
+    newsel = (float)*state->selected / (float)*state->dirCount;
+  else
+    newsel = 0;
+
   state->viewHidden = !state->viewHidden;
   *state->dirCount = countDir(state);
 

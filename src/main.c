@@ -11,7 +11,12 @@
 
 //TODO: convert bool nums to use true and false vars
 
-//FIXME: make all actions work while in an empty directory
+/*FIXME: make all actions work while in an empty directory
+unchecked actions: toggleHidden, enterVisual, printSelected,
+visualMoveDown, visualMoveUp, changeSelectionPos, selectOne, Search
+moveDown, moveUp, halfPageDown, halfPageUp, freeAction
+gotoTop, gotoBottom, backDir, yank, put */
+
 //TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   git_libgit2_init();
