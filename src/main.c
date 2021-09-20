@@ -70,9 +70,7 @@ int main(int argc, char * argv[]) {
   error = git_repository_open(&state->gitState->repo, state->gitState->repoRoot);
 
   if(error != 0 || strcmp(state->gitState->repoRoot, getenv("HOME")) == 0)
-  {
-    state->gitState->repoRoot = NULL;
-  }
+   state->gitState->repoRoot = NULL;
 
   git_status_options opts = GIT_STATUS_OPTIONS_INIT;
   if(state->gitState->repoRoot)

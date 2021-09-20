@@ -14,6 +14,8 @@ t_theme * DefaultTheme() {
   theme->directory = "\033[49;34m";
   theme->gitWarn = "\033[49;31m";
   theme->gitAdd = "\033[49;32m";
+  theme->executable = "\033[49;92m";
+  theme->pipe = "\033[49;33m";
   return theme;
 }
 

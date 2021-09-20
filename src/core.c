@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <math.h>
 #include <stdlib.h>
@@ -117,7 +118,6 @@ int isSelected(t_state * state, int lineNum)
 }
 
 //draws to terminal
-//TODO: themes
 //TODO: colour pipes, and files with execute privilage different
 void draw(t_state * state)
 {
@@ -144,8 +144,18 @@ void draw(t_state * state)
       line->invertNum = 1;
     }
 
+    if(access(state->fileAttribArray[i]->name, X_OK) != -1)
+      line->textEscCode = theme->executable;
+
     if(isDir(state->fileAttribArray[i]->name))
       line->textEscCode = theme->directory;
+
+    struct stat st;
+    stat(state->fileAttribArray[i]->name, &st);
+
+    if(S_ISFIFO(st.st_mode))
+      line->textEscCode = theme->pipe;
+
 
     line->invertText = isSelected(state, i);
     line->text = state->fileAttribArray[i]->name;
