@@ -42,8 +42,8 @@ Single selections:
 
 # Todo
 * [x] Perform basic file operations
-* [ ] Git integration
+* [ ] Git integration *some status*
 * [ ] Mass rename functionality
-* [ ] Script friendly
+* [ ] Script friendly *specify directory*
 * [ ] Preview
-* [ ] Custom themes
+* [ ] Custom themes *much easier to change*
