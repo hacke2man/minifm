@@ -102,7 +102,6 @@ int isSelected(t_state * state, int lineNum)
 }
 
 //draws to terminal
-//TODO: colour pipes, and files with execute privilage different
 void draw(t_state * state)
 {
   t_termLine * line = malloc(sizeof(t_termLine));

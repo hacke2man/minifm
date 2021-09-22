@@ -57,7 +57,6 @@ typedef struct config {
   int nameLength;
 } t_config;
 
-//TODO: add config struct
 typedef struct state{
   //data
   t_gitState * gitState;
