@@ -180,7 +180,7 @@ int countDir(t_state * state)
   static int count = 0;
   count++;
   DIR * dir;
-  dir = opendir(".");
+  dir = opendir(state->cwd);
 
   struct dirent * ent;
 
