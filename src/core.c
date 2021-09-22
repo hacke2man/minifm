@@ -10,30 +10,14 @@
 #include <git2.h>
 #include <limits.h>
 
-char * GetRepoRoot()
-{
-  char * cwd = malloc(sizeof(char) * PATH_MAX);
-  char * tmpPath = malloc(sizeof(char) * PATH_MAX);
-  cwd = getenv("PWD");
-  int error = 1;
-
-  while(error)
+//TODO: remove trailing / if exists
+void CheckArgs(t_state * state, int argc, char * argv[]) {
+  if(argc > 1)
   {
-    sprintf(tmpPath, "%s/.git", cwd);
-    if( access( tmpPath, F_OK ) == 0 ) {
-      error = 0;
-    } else {
-      error = 1;
-    }
-
-    if(error)
-    *strrchr(cwd, '/') = '\0';
+    state->cwd = argv[1];
+    strcpy(state->cwd, argv[1]);
+    *state->dirCount = countDir(state);
   }
-
-  if(strcmp(getenv("HOME"), cwd) == 0)
-    cwd[0] = '\0';
-
-  return cwd;
 }
 
 int isCursorLine(t_state * state, int line)

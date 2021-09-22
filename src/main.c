@@ -17,7 +17,6 @@ visualMoveDown, visualMoveUp, changeSelectionPos, selectOne, Search
 moveDown, moveUp, halfPageDown, halfPageUp, freeAction
 gotoTop, gotoBottom, backDir, yank, put */
 
-//TODO: make system for processing arguments
 int main(int argc, char * argv[]) {
   git_libgit2_init();
 
@@ -87,6 +86,8 @@ int main(int argc, char * argv[]) {
     state->gitState->cwdRootDiff = cwdRootDiff;
   }
 
+  struct actionNode * commands = initDefaultMappings();
+  CheckArgs(state, argc, argv);
   updateDirList(state);
 
   //##################

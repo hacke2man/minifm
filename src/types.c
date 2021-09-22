@@ -21,4 +21,112 @@ t_theme * DefaultTheme() {
   return theme;
 }
 
-//TODO: make init functions
+t_config * DefaultConfig() {
+  t_config * config = malloc(sizeof(t_config));
+
+  config->viewHidden = 0;
+  config->viewRange = 12;
+  config->nameLength = 15;
+
+  return config;
+}
+
+#include <unistd.h>
+#include <string.h>
+char * GetRepoRoot()
+{
+  char cwd[PATH_MAX];
+  char tmpPath[PATH_MAX];
+  strcpy(cwd, getenv("PWD"));
+  int error = 1;
+
+  while(error)
+  {
+    sprintf(tmpPath, "%s/.git", cwd);
+    if( access( tmpPath, F_OK ) == 0 ) {
+      error = 0;
+    } else {
+      error = 1;
+    }
+
+    if(error)
+    *strrchr(cwd, '/') = '\0';
+  }
+
+  if(strcmp(getenv("HOME"), cwd) == 0)
+    cwd[0] = '\0';
+
+  char * outString = malloc(sizeof(char) * strlen(cwd));
+  strcpy(outString, cwd);
+  return outString;
+}
+
+void SetSelected(t_state * state) {
+  for(int i = 1; i < *state->dirCount + 1; i++)
+  {
+    state->selected[i] = -1;
+  }
+  state->selected[0] = 0;
+}
+
+t_state * InitState(t_config * config, t_theme * theme) {
+  t_state * state = malloc(sizeof(t_state));
+  int * dirCount = malloc(sizeof(int));
+  state->theme = theme;
+  state->config = config;
+
+  state->cwd = malloc(sizeof(char) * PATH_MAX);
+  getcwd(state->cwd, sizeof(char) * PATH_MAX);
+  *dirCount = countDir(state);
+  state->dirCount = dirCount;
+  state->tty = fopen("/dev/tty", "w");
+  state->fileAttribArray = malloc(sizeof(t_fileAttrib) * 10000);
+  state->selected = malloc(sizeof(int) * *dirCount + 1);
+  state->mode = NORMAL;
+  state->topOfSelection = 1;
+  state->msg = malloc(sizeof(char) * PATH_MAX);
+  state->msg[0] = '\0';
+  SetSelected(state);
+
+  tcgetattr( STDIN_FILENO, &state->oldt);
+  cfmakeraw(&state->newt);
+  tcsetattr( STDIN_FILENO, TCSANOW, &state->newt);
+  fprintf(state->tty, "\e[?25l");
+
+  return state;
+}
+
+void GitInit(t_state * state, int error, git_status_options * opts) {
+  if(error != 0 || strcmp(state->gitState->repoRoot, getenv("HOME")) == 0)
+   state->gitState->repoRoot = NULL;
+
+  if(state->gitState->repoRoot)
+  {
+    state->gitState->opts = opts;
+    char * cwdRootDiff = malloc(sizeof(char) * PATH_MAX);
+
+    cwdRootDiff[0] = '\0';
+    if(strlen(state->cwd) != strlen(state->gitState->repoRoot))
+      strcpy(cwdRootDiff, &state->cwd[strlen(state->gitState->repoRoot) + 1]);
+    if(strlen(cwdRootDiff) > 0)
+      strcat(cwdRootDiff, "/");
+
+    state->gitState->cwdRootDiff = cwdRootDiff;
+  }
+}
+
+void FreeState(t_state * state) {
+  fprintf(state->tty, "\033[J");
+  tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
+  fprintf(state->tty, "\e[?25h");
+
+  git_repository_free(state->gitState->repo);
+  // HACK: crashes when i free why???
+  // free(state->cwd);
+  free(state->dirCount);
+  free(state->gitState);
+  free(state->config);
+  free(state->msg);
+  free(state->selected);
+  free(state);
+}
