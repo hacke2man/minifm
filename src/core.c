@@ -147,15 +147,19 @@ void draw(t_state * state)
     if(access(state->fileAttribArray[i]->name, X_OK) != -1)
       line->textEscCode = theme->executable;
 
-    if(isDir(state->fileAttribArray[i]->name))
-      line->textEscCode = theme->directory;
-
-    struct stat st;
-    stat(state->fileAttribArray[i]->name, &st);
-
-    if(S_ISFIFO(st.st_mode))
-      line->textEscCode = theme->pipe;
-
+    switch(state->fileAttribArray[i]->fileMode) {
+      case REGULAR:
+        break;
+      case FIFO:
+        line->textEscCode = theme->pipe;
+        break;
+      case DIRECTORY:
+        line->textEscCode = theme->directory;
+        break;
+      case EXACUTABLE:
+      line->textEscCode = theme->executable;
+        break;
+    }
 
     line->invertText = isSelected(state, i);
     line->text = state->fileAttribArray[i]->name;

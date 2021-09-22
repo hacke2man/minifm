@@ -1,6 +1,7 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
+#include <dirent.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,11 +18,17 @@ typedef enum{
   VISUAL = 4,
 } mode;
 
+typedef enum {
+  FIFO,
+  REGULAR,
+  EXACUTABLE,
+  DIRECTORY,
+} file_mode;
+
 typedef struct s_fileAttrib {
   char * name;
+  file_mode fileMode;
   unsigned int gitStatus;
-  unsigned int lastModified;
-  unsigned int permissions;
 } t_fileAttrib;
 
 typedef struct gitState {

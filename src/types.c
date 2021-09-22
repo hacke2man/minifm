@@ -1,5 +1,7 @@
 #include "types.h"
+#include <limits.h>
 #include <stdlib.h>
+#include "info.h"
 
 void freeFileAttrib(t_fileAttrib * fileAttrib)
 {

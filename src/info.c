@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,13 +13,11 @@ int compFunc(const void * a, const void * b)
 {
   t_fileAttrib ** aval = (t_fileAttrib **) a;
   int ascore = 0;
-  if(isDir((*aval)->name))
-    ascore -= 10 ;
+  ascore -= (*aval)->fileMode * 10;
 
   t_fileAttrib ** bval = (t_fileAttrib **) b;
   int bscore = 0;
-  if(isDir((*bval)->name))
-    bscore -= 10;
+  bscore -= (*bval)->fileMode * 10;
 
   if(strcmp((*aval)->name, (*bval)->name) >= 0)
     ascore++;
@@ -69,14 +68,29 @@ void SetGitStatus(t_state * state)
   }
 }
 
+file_mode CheckMode(char * fileName) {
+  struct stat st;
+  stat(fileName, &st);
+
+  if (S_ISREG(st.st_mode))
+    return REGULAR;
+  if (S_ISFIFO(st.st_mode))
+    return FIFO;
+  if (S_ISDIR(st.st_mode))
+    return DIRECTORY;
+  if (access(fileName, X_OK))
+    return DIRECTORY;
+  return -1;
+}
+
 //change proccess dir
-//TODO: notice deleted/added files after process is launched
 //possible do this by having an update string array so it can keep
 //track of everything on its own
 void updateDirList(t_state * state)
 {
   int viewHidden = state->config->viewHidden;
   t_fileAttrib ** fileAttribArray = state->fileAttribArray;
+  char fileName[PATH_MAX];
 
   int dircount = countDir(state);
   DIR * dir;
@@ -104,6 +118,8 @@ void updateDirList(t_state * state)
       memset(fileAttribArray[ind]->name, '\0', sizeof(ent->d_name));
       strcpy(fileAttribArray[ind]->name, ent->d_name);
       fileAttribArray[ind]->gitStatus = 0;
+      sprintf(fileName, "%s/%s", state->cwd, fileAttribArray[ind]->name);
+      fileAttribArray[ind]->fileMode = CheckMode(fileName);
       ind++;
     }
     ent = readdir(dir);
@@ -156,7 +172,6 @@ int getStart(t_state * state)
 
 #include <dirent.h>
 #include <string.h>
-#include <sys/stat.h>
 
 //count files in dir
 int countDir(t_state * state)
