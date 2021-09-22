@@ -42,7 +42,7 @@ Single selections:
 
 # Todo
 * [x] Perform basic file operations
-* [ ] Git integration <span style="color:dim gray">\**some status*</span>.
+* [ ] Git integration <span style="color:blue">\**some status*</span>.
 * [ ] Mass rename functionality
 * [ ] Script friendly <span style="color:dim gray">\**specify directory*</span>.
 * [ ] Preview
