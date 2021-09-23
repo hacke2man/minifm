@@ -327,5 +327,7 @@ int put(t_state * state)
     sprintf(command, "cp -r %s %s", putFile, state->cwd);
     system(command);
   }
+
+  fclose(yankList);
   return 1;
 }
