@@ -25,7 +25,7 @@ All of the other features in mfm are done outside of the current shell, and thus
 
 ## Installation
 ```bash
-sudo make clean install
+sudo make install
 ```
 
 ## Screenshots
