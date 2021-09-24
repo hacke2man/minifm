@@ -7,18 +7,29 @@ SRCS = $(wildcard src/*.c)
 BINS = $(SRCS:src/%.c=%)
 LINK = $(BINS:%=build/%.o)
 
-all: checkenv ${BINS}
+default: checkenv compile finish
+
+compile: ${BINS}
 	$(cc) $(libs) $(flags) $(LINK)
 
 checkenv:
-	[ -d build ] || mkdir build
+	@[ -d build ] || mkdir build
+
+finish:
+	@if [ -n "$(SUDO_USER)" ]; then\
+		chown $(SUDO_USER) -R build a.out;\
+	fi
 
 %: src/%.c
 	$(cc) -c $< -o build/$@.o
 
 clean:
-	[ -f build ] && rm -rf build && mkdir build
-	[ -f a.out ] && rm a.out
+	@if [ -d "build" ]; then\
+		rm -rf build;\
+	fi
+	@if [ -f "a.out" ]; then\
+		rm a.out;\
+	fi
 
-install: all
+install: default
 	cp a.out /usr/local/bin/minifm
