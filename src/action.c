@@ -309,6 +309,8 @@ int yank(t_state * state)
   int i = state->mode != VISUAL && state->selected[1] != -1 ? 1 : 0;
   for(; state->selected[i] != -1; i++)
     fprintf(yankList, "%s/%s\n", state->cwd, state->fileAttribArray[state->selected[i]]->name);
+
+  fclose(yankList);
   return 1;
 }
 
