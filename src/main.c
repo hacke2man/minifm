@@ -33,8 +33,8 @@ int main(int argc, char * argv[]) {
   GitInit(state, error, &opts);
 
   struct actionNode * commands = initDefaultMappings();
-  CheckArgs(state, argc, argv);
   updateDirList(state);
+  CheckArgs(state, argc, argv);
 
   // program loop
   int done = 0;

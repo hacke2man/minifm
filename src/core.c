@@ -11,43 +11,6 @@
 #include <limits.h>
 #include <string.h>
 
-void CheckFlag(t_state * state, char arg) {
-  switch (arg) {
-    case 'a':
-      toggleHidden(state);
-      break;
-    default:
-      break;
-  }
-}
-
-//TODO: remove trailing / if exists
-void CheckArgs(t_state * state, int argc, char * argv[]) {
-  int line;
-  for(int i = 0; i < argc; i++)
-  {
-    if(*argv[i] == '-') {
-      if(strlen(argv[i]) > 1) {
-        for(int j = 1; j < strlen(argv[i]); j++) {
-          if(sscanf(&argv[i][j], "%d", &line) == 1) {
-            for(int k = 0; k < line - 1; k++)
-              moveDown(state);
-            break;
-          }
-          CheckFlag(state, argv[i][j]);
-        }
-      }
-    } else {
-      if(isDir(argv[i]))
-      {
-        state->cwd = argv[1];
-        strcpy(state->cwd, argv[1]);
-        *state->dirCount = countDir(state);
-      }
-    }
-  }
-}
-
 int isCursorLine(t_state * state, int line)
 {
   int * selected = state->selected;
@@ -180,6 +143,47 @@ void draw(t_state * state)
   fprintf(state->tty, "%s\n\r", state->msg);
   fprintf(state->tty, "\033[%dA", getEnd(state) - getStart(state) + 1);
   free(line);
+}
+
+void CheckFlag(t_state * state, char arg) {
+  switch (arg) {
+    case 'a':
+      toggleHidden(state);
+      break;
+    case 's':
+      draw(state);
+      Search(state);
+      break;
+    default:
+      break;
+  }
+}
+
+//TODO: remove trailing / if exists
+void CheckArgs(t_state * state, int argc, char * argv[]) {
+  int line;
+  for(int i = 0; i < argc; i++)
+  {
+    if(*argv[i] == '-') {
+      if(strlen(argv[i]) > 1) {
+        for(int j = 1; j < strlen(argv[i]); j++) {
+          if(sscanf(&argv[i][j], "%d", &line) == 1) {
+            for(int k = 0; k < line - 1; k++)
+              moveDown(state);
+            break;
+          }
+          CheckFlag(state, argv[i][j]);
+        }
+      }
+    } else {
+      if(isDir(argv[i]))
+      {
+        state->cwd = argv[1];
+        strcpy(state->cwd, argv[1]);
+        *state->dirCount = countDir(state);
+      }
+    }
+  }
 }
 
 int canMatch(mode mode, char * combo, struct actionNode * head)

@@ -44,7 +44,7 @@ Single selections:
 * [x] Perform basic file operations
 * [ ] Git integration \**some status*
 * [ ] Mass rename functionality
-* [ ] Script friendly \**specify directory*
+* [x] Script friendly
 * [ ] Preview
 * [ ] Custom themes \**much easier to change*
 
