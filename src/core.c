@@ -9,14 +9,42 @@
 #include "info.h"
 #include <git2.h>
 #include <limits.h>
+#include <string.h>
+
+void CheckFlag(t_state * state, char arg) {
+  switch (arg) {
+    case 'a':
+      toggleHidden(state);
+      break;
+    default:
+      break;
+  }
+}
 
 //TODO: remove trailing / if exists
 void CheckArgs(t_state * state, int argc, char * argv[]) {
-  if(argc > 1)
+  int line;
+  for(int i = 0; i < argc; i++)
   {
-    state->cwd = argv[1];
-    strcpy(state->cwd, argv[1]);
-    *state->dirCount = countDir(state);
+    if(*argv[i] == '-') {
+      if(strlen(argv[i]) > 1) {
+        for(int j = 1; j < strlen(argv[i]); j++) {
+          if(sscanf(&argv[i][j], "%d", &line) == 1) {
+            for(int k = 0; k < line - 1; k++)
+              moveDown(state);
+            break;
+          }
+          CheckFlag(state, argv[i][j]);
+        }
+      }
+    } else {
+      if(isDir(argv[i]))
+      {
+        state->cwd = argv[1];
+        strcpy(state->cwd, argv[1]);
+        *state->dirCount = countDir(state);
+      }
+    }
   }
 }
 
