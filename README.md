@@ -12,10 +12,14 @@ As far as I know changing the current directory of your shell has to be done by 
 ```bash
 function mfm()
 {
-  mfm_path=`minifm </dev/tty`
-
-  [ -d "$mfm_path" ] && cd $mfm_path
-  [ -f "$mfm_path" ] && $EDITOR $mfm_path
+  mfm_path="$1"
+  mfm_backup_path=""
+  while [ -n "$mfm_path" ]; do
+    mfm_path=`minifm $mfm_path </dev/tty`
+    [ -f "$mfm_path" ] && $EDITOR $mfm_path
+    [ -d "$mfm_path" ] && cd $mfm_path
+    [ -n "$mfm_path" ] && mfm_path="$PWD"
+  done
 }
 ```
 

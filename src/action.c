@@ -281,17 +281,9 @@ int gotoBottom(t_state * state){
 
 int backDir(t_state * state)
 {
-  t_fileAttrib ** fileAttribArray = state->fileAttribArray;
-  int * dirCount = state->dirCount;
-  FILE * tty = state->tty;
-  for(int i = 0; i < *dirCount; i++)
-    freeFileAttrib(fileAttribArray[i]);
-
-  fprintf(tty, "\033[J");
-  tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
-  fprintf(tty, "\e[?25h");
-  printf("..");
-  exit(0);
+  *strrchr(state->cwd, '/') = '\0';
+  printf("%s", state->cwd);
+  return 1;
 }
 
 int removeFile(t_state * state)
