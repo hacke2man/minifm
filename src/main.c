@@ -34,10 +34,10 @@ int main(int argc, char * argv[]) {
 
   struct actionNode * commands = initDefaultMappings();
   updateDirList(state);
-  CheckArgs(state, argc, argv);
+  int done;
+  done = CheckArgs(state, argc, argv);
 
   // program loop
-  int done = 0;
   while(!done){
     draw(state);
     done = input(state, commands);

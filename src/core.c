@@ -145,22 +145,43 @@ void draw(t_state * state)
   free(line);
 }
 
-void CheckFlag(t_state * state, char arg) {
+int CheckFlag(t_state * state, char arg) {
   switch (arg) {
     case 'a':
       toggleHidden(state);
       break;
-    case 's':
-      draw(state);
-      Search(state);
+    case 'h':
+      printf(
+          "Minifm help\n\r"
+          "     -a show hidden files\n\r"
+          "     -h show this\n\r"
+          "Controls:\n\r"
+          "j            move down\n\r"
+          "k            move up\n\r"
+          "/            search\n\r"
+          "enter        output file path\n\r"
+          "escape       close program \n\r"
+          "G            goto bottom\n\r"
+          "gg           goto top\n\r"
+          "b            output parent dir\n\r"
+          "v            visual mode\n\r"
+          "^H           toggle hidden\n\r"
+          "dd           delete file\n\r"
+          "yy           yank file(s)\n\r"
+          "p            put file(s)\n\r"
+          "V            select one\n\r"
+          "o            swap visual position\n\r"
+          );
+      return 1;
       break;
     default:
       break;
   }
+  return 0;
 }
 
 //TODO: remove trailing / if exists
-void CheckArgs(t_state * state, int argc, char * argv[]) {
+int CheckArgs(t_state * state, int argc, char * argv[]) {
   int line;
   for(int i = 0; i < argc; i++)
   {
@@ -172,7 +193,9 @@ void CheckArgs(t_state * state, int argc, char * argv[]) {
               moveDown(state);
             break;
           }
-          CheckFlag(state, argv[i][j]);
+          if(CheckFlag(state, argv[i][j]) == 1) {
+            return 1;
+          }
         }
       }
     } else {
@@ -184,6 +207,7 @@ void CheckArgs(t_state * state, int argc, char * argv[]) {
       }
     }
   }
+  return 0;
 }
 
 int canMatch(mode mode, char * combo, struct actionNode * head)
@@ -223,7 +247,7 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "gg", gotoTop));
   listQueue(commands, initAction(NORMAL, "G", gotoBottom));
   listQueue(commands, initAction(NORMAL, "b", backDir));
-  listQueue(commands, initAction(NORMAL, " h", toggleHidden));
+  listQueue(commands, initAction(NORMAL, "\x8", toggleHidden));
   listQueue(commands, initAction(NORMAL, "V", selectOne));
   listQueue(commands, initAction(NORMAL | VISUAL, "dd", removeFile));
   listQueue(commands, initAction(NORMAL | VISUAL, "yy", yank));
