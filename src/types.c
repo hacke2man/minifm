@@ -86,6 +86,7 @@ t_state * InitState(t_config * config, t_theme * theme) {
   state->topOfSelection = 1;
   state->msg = malloc(sizeof(char) * PATH_MAX);
   state->msg[0] = '\0';
+  state->flags = 0;
   SetSelected(state);
 
   tcgetattr( STDIN_FILENO, &state->oldt);

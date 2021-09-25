@@ -57,6 +57,11 @@ typedef struct config {
   int nameLength;
 } t_config;
 
+typedef enum {
+  OUTPUT_LINE_NUM = 1
+} t_flags;
+
+
 typedef struct state{
   //data
   t_gitState * gitState;
@@ -70,6 +75,7 @@ typedef struct state{
   int topOfSelection;
   struct termios oldt;
   struct termios newt;
+  t_flags flags;
 
   //config
   t_config * config;
