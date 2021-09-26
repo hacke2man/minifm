@@ -1,6 +1,6 @@
 .PHONY = all clean
 cc = gcc
-libs = -lm -lgit2
+libs = -lm
 flags = -g
 
 SRCS = $(wildcard src/*.c)

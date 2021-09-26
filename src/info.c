@@ -27,47 +27,6 @@ int compFunc(const void * a, const void * b)
   return ascore - bscore;
 }
 
-int MatchChildOrParent(t_state * state, char * fileName, const char * gitFileName)
-{
-  char tmpFilePath[PATH_MAX];
-  sprintf(tmpFilePath, "%s%s", state->gitState->cwdRootDiff, fileName);
-
-  int matches = 1;
-  for(int i = 0; i < strlen(tmpFilePath); i++)
-  {
-    if(tmpFilePath[i] != gitFileName[i])
-    {
-      matches = 0;
-      break;
-    }
-  }
-
-  return matches;
-}
-
-void SetFileGitStatus(t_state * state, const char * fileName, unsigned int status)
-{
-  for(int i = 0; i < *state->dirCount; i++)
-  {
-    if(MatchChildOrParent(state, state->fileAttribArray[i]->name, fileName))
-      state->fileAttribArray[i]->gitStatus = status | state->fileAttribArray[i]->gitStatus;
-  }
-}
-
-void SetGitStatus(t_state * state)
-{
-  const git_status_entry * entry;
-  size_t count = git_status_list_entrycount(state->gitState->statuses);
-
-  for (size_t i=0; i<count; ++i) {
-    entry = git_status_byindex(state->gitState->statuses, i);
-    if(entry->head_to_index)
-      SetFileGitStatus(state, entry->head_to_index->new_file.path, entry->status);
-    else
-      SetFileGitStatus(state, entry->index_to_workdir->new_file.path, entry->status);
-  }
-}
-
 file_mode CheckMode(char * fileName) {
   struct stat st;
   stat(fileName, &st);
@@ -126,18 +85,6 @@ void updateDirList(t_state * state)
   }
   closedir(dir);
   qsort(fileAttribArray, dircount, sizeof(char *), compFunc);
-
-  if(state->gitState->repoRoot)
-  {
-    state->gitState->statuses = NULL;
-    int error = git_status_list_new(&state->gitState->statuses, state->gitState->repo, state->gitState->opts);
-    if(error != 0)
-    {
-      printf("no status list\n");
-      getchar();
-    }
-    SetGitStatus(state);
-  }
 }
 
 //determin how many remaining files can be drawn

@@ -66,7 +66,7 @@ void printLine(t_state * state, t_termLine * line)
   statusString[0] = '\0';
 
   fprintf(state->tty,
-  "\e[%dm%s%*d \e[%dm%s%-*.*s\e[0m %s\e[0m\n\r",
+  "\e[%dm%s%*d \e[%dm%s%-*.*s\e[0m\n\r",
   invertNum,
   line->numEscCode,
   line->numPadding,
@@ -75,8 +75,7 @@ void printLine(t_state * state, t_termLine * line)
   line->textEscCode,
   line->nameLength,
   line->nameLength,
-  line->text,
-  PrintStatus(statusString, line->gitStatus));
+  line->text);
 
   free(statusString);
 }

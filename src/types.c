@@ -97,35 +97,14 @@ t_state * InitState(t_config * config, t_theme * theme) {
   return state;
 }
 
-void GitInit(t_state * state, int error, git_status_options * opts) {
-  if(error != 0 || strcmp(state->gitState->repoRoot, getenv("HOME")) == 0)
-   state->gitState->repoRoot = NULL;
-
-  if(state->gitState->repoRoot)
-  {
-    state->gitState->opts = opts;
-    char * cwdRootDiff = malloc(sizeof(char) * PATH_MAX);
-
-    cwdRootDiff[0] = '\0';
-    if(strlen(state->cwd) != strlen(state->gitState->repoRoot))
-      strcpy(cwdRootDiff, &state->cwd[strlen(state->gitState->repoRoot) + 1]);
-    if(strlen(cwdRootDiff) > 0)
-      strcat(cwdRootDiff, "/");
-
-    state->gitState->cwdRootDiff = cwdRootDiff;
-  }
-}
-
 void FreeState(t_state * state) {
   fprintf(state->tty, "\033[J");
   tcsetattr(STDIN_FILENO, TCSANOW, &state->oldt);
   fprintf(state->tty, "\e[?25h");
 
-  git_repository_free(state->gitState->repo);
   // HACK: crashes when i free why???
   // free(state->cwd);
   free(state->dirCount);
-  free(state->gitState);
   free(state->config);
   free(state->msg);
   free(state->selected);

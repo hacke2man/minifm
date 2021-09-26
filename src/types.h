@@ -31,15 +31,6 @@ typedef struct s_fileAttrib {
   unsigned int gitStatus;
 } t_fileAttrib;
 
-typedef struct gitState {
-  char * repoRoot;
-  char * cwdRootDiff;
-  git_repository * repo;
-  git_index * index;
-  git_status_options * opts;
-  git_status_list * statuses;
-} t_gitState;
-
 typedef struct theme {
   char * normal;
   char * numberLine;
@@ -64,7 +55,6 @@ typedef enum {
 
 typedef struct state{
   //data
-  t_gitState * gitState;
   mode mode;
   int * dirCount;
   int * selected;
