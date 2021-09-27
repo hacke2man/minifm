@@ -7,7 +7,6 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include <termios.h>
-#include <git2.h>
 
 #define true 1
 #define false 0
@@ -105,7 +104,6 @@ t_theme * DefaultTheme();
 t_config * DefaultConfig();
 t_state * InitState(t_config * config, t_theme * theme);
 void FreeState(t_state * state);
-void GitInit(t_state * state, int error, git_status_options * opts);
 
 #ifdef __cplusplus
 }
