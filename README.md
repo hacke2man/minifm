@@ -3,6 +3,7 @@
 Minifm ie MiniFileManager is a visual file manager inspired by program such as Ranger, Vifm, NNN, etc; as well as fzf, and fzy in the way they use term codes instead of ncurses to avoid making the program a full screen process.
 
 **WARNING**: this program is in it's early stages use at your own risk, and if it doesn't work for you be sure to let me know, I'd really like to have it running well on other machines.
+**REWRITE**: the code for the project isn't maintainable, so I'm working on some better foundations that'll show up elsewhere on my github, before they're implemented here
 
 ## Usage
 this program is ment to preform small action on files in the current directory, such as changing directory, opening a file, deleting, copying.
