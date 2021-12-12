@@ -1,5 +1,5 @@
 .PHONY = all clean
-cc = gcc
+cc = tcc
 libs = -lm
 flags = -g
 

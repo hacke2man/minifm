@@ -253,6 +253,8 @@ struct actionNode * initDefaultMappings()
   listQueue(commands, initAction(NORMAL, "p", put));
   listQueue(commands, initAction(NORMAL, "\4", halfPageDown)); //ctrl-D
   listQueue(commands, initAction(NORMAL, "\x15", halfPageUp)); //ctrl-U
+  listQueue(commands, initAction(NORMAL, "mkd", MkDir));
+  listQueue(commands, initAction(NORMAL, "mkf", MkFile));
 
   listQueue(commands, initAction(NORMAL, "v", enterVisual));
   listQueue(commands, initAction(VISUAL, "j", visualMoveDown));

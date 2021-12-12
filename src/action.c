@@ -190,6 +190,66 @@ int Search(t_state * state)
   }
 }
 
+int MkDir(t_state * state)
+{
+  char * cwd = state->cwd;
+  char tmp[2] = {' ', '\0'};
+  char newName[256];
+  newName[0] = '\0';
+  char mkdirCommand[PATH_MAX];
+
+  state->msg[0] = '\0';
+  draw(state);
+
+  while(1)
+  {
+    tmp[0] = getchar();
+    if(tmp[0] == 27)
+    return 0;
+    else if(tmp[0] == '\r')
+    {
+      sprintf(mkdirCommand ,"mkdir %s/%s", cwd, newName);
+      system(mkdirCommand);
+      printf("%s/%s", cwd, newName);
+      return 1;
+    }
+
+    strcat(newName, tmp);
+    strcpy(state->msg, newName);
+    draw(state);
+  }
+}
+
+int MkFile(t_state * state)
+{
+  char * cwd = state->cwd;
+  char tmp[2] = {' ', '\0'};
+  char newName[256];
+  newName[0] = '\0';
+  char mkFileCommand[PATH_MAX];
+
+  state->msg[0] = '\0';
+  draw(state);
+
+  while(1)
+  {
+    tmp[0] = getchar();
+    if(tmp[0] == 27)
+    return 0;
+    else if(tmp[0] == '\r')
+    {
+      sprintf(mkFileCommand ,"touch %s/%s", cwd, newName);
+      system(mkFileCommand);
+      printf("%s/%s", cwd, newName);
+      return 1;
+    }
+
+    strcat(newName, tmp);
+    strcpy(state->msg, newName);
+    draw(state);
+  }
+}
+
 //output name of selected file and exit program
 int enter(t_state * state)
 {

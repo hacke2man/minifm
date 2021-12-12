@@ -29,6 +29,8 @@ int printSelected(t_state * state);
 int selectOne(t_state * state);
 int halfPageUp(t_state * state);
 int halfPageDown(t_state * state);
+int MkDir(t_state * state);
+int MkFile(t_state * state);
 
 #ifdef __cplusplus
 }
